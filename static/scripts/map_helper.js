@@ -1,0 +1,367 @@
+function mapLine(geojson_nodes, id) {
+
+    var featuresdata = geojson_nodes.features
+
+    featuresdata.forEach(function (feature, i) {
+        feature.LatLng = new L.LatLng(
+            feature.geometry.coordinates[1],
+            feature.geometry.coordinates[0]
+        )
+    })
+    var new_svg = L.svg().addTo(map);
+    var svg = d3.select(new_svg._container).attr("id", id);
+    var g = svg.append("g").attr("class", "leaflet-zoom-hide path");
+
+    // WARNING disabled after add svg with leaflet method...
+    var transform = d3.geoTransform({
+        point: projectPoint
+    });
+    // WARNING disabled after add svg with leaflet method...
+    var d3path = d3.geoPath().projection(transform);
+
+
+    var toLine = d3.line()
+        //.interpolate("linear")
+        .x(function (d) {
+            return applyLatLngToLayer(d).x
+        })
+        .y(function (d) {
+            return applyLatLngToLayer(d).y
+        });
+
+    // draw the line
+    var linePathDrawn = g.selectAll(".lineDrawn")
+        .data([featuresdata])
+        .enter().append("path")
+        .attr("class", "lineDrawn")
+        .attr("d", toLine)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", "5")
+        .style("opacity", "1");
+
+    // when the user zooms in or out you need to reset
+    // the view
+    map.on("zoom", reset);
+
+    // this puts stuff on the map!
+    reset();
+
+    // Reposition the SVG to cover the features.
+    function reset() {
+        // WARNING disabled after add svg with leaflet method...
+        // var bounds = d3path.bounds(geojson_nodes),
+        //     topLeft = bounds[0],
+        //     bottomRight = bounds[1];
+        // // Setting the size and location of the overall SVG container
+        // svg.attr("width", bottomRight[0] - topLeft[0] + 120)
+        //     .attr("height", bottomRight[1] - topLeft[1] + 120)
+        //     .style("left", topLeft[0] - 50 + "px")
+        //     .style("top", topLeft[1] - 50 + "px");
+
+        linePathDrawn.attr("d", toLine)
+        // WARNING disabled after add svg with leaflet method...
+        // g.attr("transform", "translate(" + (-topLeft[0] + 50) + "," + (-topLeft[1] + 50) + ")");
+
+    }
+
+    function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+    } //end projectPoint
+}
+
+
+function mapPoints(geojson_nodes, idxToSelect, id) {
+    var featuresdata = geojson_nodes.features
+
+    featuresdata.forEach(function (feature, i) {
+        feature.LatLng = new L.LatLng(
+            feature.geometry.coordinates[1],
+            feature.geometry.coordinates[0]
+        )
+    })
+
+    var new_svg = L.svg().addTo(map);
+    var svg = d3.select(new_svg._container).attr("id", id).attr("pointer-events", "auto");
+    var g = svg.select("g").attr("class", "leaflet-zoom-hide path");
+
+
+    var transform = d3.geoTransform({
+        point: projectPoint
+    });
+
+    //d3.geoPath translates GeoJSON to SVG path codes.
+    //essentially a path generator. In this case it's
+    // a path generator referencing our custom "projection"
+    // which is the Leaflet method latLngToLayerPoint inside
+    // our function called projectPoint
+    var d3path = d3.geoPath().projection(transform);
+
+    var pointsFound = featuresdata
+
+    var linePoints = g.selectAll(".PathNodes")
+        .data(pointsFound)
+        .enter()
+        .append("circle", ".PathNodes")
+        .attr("class", "PathNodes pulse")
+
+    // I want names for my coffee and beer
+    var textPoints = g.selectAll("text")
+        .data(pointsFound)
+        .enter()
+        .append("text")
+        .text(function(d) {
+            return d.properties.position
+        })
+        .attr("class", "PathNodesText")
+        .attr("text-anchor", "middle")
+        .attr("y", 4.5)
+
+    // when the user zooms in or out you need to reset
+    // the view
+    map.on("zoom", reset);
+    // this puts stuff on the map!
+    reset();
+
+    // Reposition the SVG to cover the features.
+    function reset() {
+
+        textPoints.attr("transform",
+            function (d) {
+                return "translate(" +
+                    applyLatLngToLayer(d).x + "," +
+                    applyLatLngToLayer(d).y + ")";
+        });
+
+
+        // for the points we need to convert from latlong
+        // to map units
+        linePoints.attr("transform",
+            function (d) {
+                return "translate(" +
+                    applyLatLngToLayer(d).x + "," +
+                    applyLatLngToLayer(d).y + ")";
+            });
+    }
+
+    function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+    }
+}
+
+
+function animatePointOnLine(geojson_nodes, id) {
+
+    // this is not needed right now, but for future we may need
+    // to implement some filtering. This uses the d3 filter function
+    // featuresdata is an array of point objects
+
+    var featuresdata = geojson_nodes.features
+
+    featuresdata.forEach(function (feature, i) {
+        feature.LatLng = new L.LatLng(
+            feature.geometry.coordinates[1],
+            feature.geometry.coordinates[0]
+        )
+    })
+
+    // if you don't include the leaflet-zoom-hide when a
+    // user zooms in or out you will still see the phantom
+    // original SVG
+    var new_svg = L.svg().addTo(map);
+    var svg = d3.select(new_svg._container).attr("id", id);
+    var g = svg.append("g").attr("class", "leaflet-zoom-hide path_" + id);
+
+
+    //stream transform. transforms geometry before passing it to
+    // listener. Can be used in conjunction with d3.geoPath
+    // to implement the transform.
+
+    var transform = d3.geoTransform({
+        point: projectPoint
+    });
+
+    //d3.geoPath translates GeoJSON to SVG path codes.
+    //essentially a path generator. In this case it's
+    // a path generator referencing our custom "projection"
+    // which is the Leaflet method latLngToLayerPoint inside
+    // our function called projectPoint
+    var d3path = d3.geoPath().projection(transform);
+
+
+    // Here we're creating a FUNCTION to generate a line
+    // from input points. Since input points will be in
+    // Lat/Long they need to be converted to map units
+    // with applyLatLngToLayer
+    var toLine = d3.line()
+        //.interpolate("linear")
+        .x(function (d) {
+            return applyLatLngToLayer(d).x
+        })
+        .y(function (d) {
+            return applyLatLngToLayer(d).y
+        });
+
+
+    // From now on we are essentially appending our features to the
+    // group element. We're adding a class with the line name
+    // and we're making them invisible
+
+    // these are the points that make up the path
+    // they are unnecessary so I've make them
+    // transparent for now
+    var ptFeatures = g.selectAll("circle")
+        .data(featuresdata)
+        .enter()
+        .append("circle")
+        .attr("r", 3)
+        .attr("class", "waypoints_" + id)
+        .style("opacity", "0");
+
+    // Here we will make the points into a single
+    // line/path. Note that we surround the featuresdata
+    // with [] to tell d3 to treat all the points as a
+    // single line. For now these are basically points
+    // but below we set the "d" attribute using the
+    // line creator function from above.
+    var linePath = g.selectAll(".lineConnect_" + id)
+        .data([featuresdata])
+        .enter()
+        .append("path")
+        .attr("class", "lineConnect_" + id)
+        .style("fill", "none")
+        .attr("d", toLine)
+        .style("stroke", "black")
+        // .style("stroke", "white")
+        .style("stroke-width", "2")
+        .style("opacity", "0")
+
+
+    // This will be our traveling circle it will
+    // travel along our path
+    var marker = g.append("circle")
+        .attr("r", 10)
+        .attr("id", "marker_" + id)
+        .attr("class", "travelMarker_" + id)
+        .style("fill", "yellow")
+
+    // TODO should be optional and add argument
+    var textmarker = g.append("text")
+        .attr("font-family", "'Font Awesome 5 Free'")
+        .attr("font-weight", 900)
+        .text("\uf238")
+        .attr("x", -5)
+        .attr("y", 5)
+        .attr("id", "markerText_" + id)
+        .attr("class", "travelMarkerText_" + id)
+        // https://fontawesome.com/cheatsheet
+
+
+
+    // when the user zooms in or out you need to reset
+    // the view
+    map.on("zoom", reset);
+
+    // this puts stuff on the map!
+    reset();
+    transition();
+
+    // Reposition the SVG to cover the features.
+    function reset() {
+        // WARNING disabled after add svg with leaflet method...
+        // var bounds = d3path.bounds(geojson_nodes),
+        //     topLeft = bounds[0],
+        //     bottomRight = bounds[1];
+
+
+        // here you're setting some styles, width, heigh etc
+        // to the SVG. Note that we're adding a little height and
+        // width because otherwise the bounding box would perfectly
+        // cover our features BUT... since you might be using a big
+        // circle to represent a 1 dimensional point, the circle
+        // might get cut off.
+
+        ptFeatures.attr("transform",
+            function (d) {
+                return "translate(" +
+                    applyLatLngToLayer(d).x + "," +
+                    applyLatLngToLayer(d).y + ")";
+            });
+
+        // again, not best practice, but I'm harding coding
+        // the starting point
+
+        marker.attr("transform",
+            function () {
+                var y = featuresdata[0].geometry.coordinates[1]
+                var x = featuresdata[0].geometry.coordinates[0]
+                return "translate(" +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
+            });
+
+        textmarker.attr("transform",
+            function () {
+                var y = featuresdata[0].geometry.coordinates[1]
+                var x = featuresdata[0].geometry.coordinates[0]
+                return "translate(" +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
+            });
+        // WARNING disabled after add svg with leaflet method...
+        // Setting the size and location of the overall SVG container
+        // svg.attr("width", bottomRight[0] - topLeft[0] + 120)
+        //     .attr("height", bottomRight[1] - topLeft[1] + 120)
+        //     .style("left", topLeft[0] - 50 + "px")
+        //     .style("top", topLeft[1] - 50 + "px");
+
+        linePath.attr("d", toLine)
+        // WARNING disabled after add svg with leaflet method...
+        // g.attr("transform", "translate(" + (-topLeft[0] + 50) + "," + (-topLeft[1] + 50) + ")");
+
+    }
+
+    function transition() {
+        linePath.transition()
+            .duration(7500)
+            .attrTween("stroke-dasharray", tweenDash)
+            .on("end", function () {
+                d3.select(this).call(transition);// infinite loop
+            });
+    } //end transition
+
+    // this function feeds the attrTween operator above with the
+    // stroke and dash lengths
+    function tweenDash() {
+        return function (t) {
+            //total length of path (single value)
+            var l = linePath.node().getTotalLength();
+
+            interpolate = d3.interpolateString("0," + l, l + "," + l);
+            //t is fraction of time 0-1 since transition began
+            var marker = d3.select("#marker_" + id);
+            var textmarker = d3.select("#markerText_" + id);
+
+            var p = linePath.node().getPointAtLength(t * l);
+
+            //Move the marker to that point
+            marker.attr("transform", "translate(" + p.x + "," + p.y + ")"); //move marker
+            textmarker.attr("transform", "translate(" + p.x + "," + p.y + ")"); //move marker
+
+            return interpolate(t);
+        }
+    } //end tweenDash
+
+    function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+    } //end projectPoint
+}
+
+function applyLatLngToLayer(d) {
+    var y = d.geometry.coordinates[1]
+    var x = d.geometry.coordinates[0]
+    return map.latLngToLayerPoint(new L.LatLng(y, x))
+}

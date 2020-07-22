@@ -1,0 +1,38 @@
+
+.legend {
+    position: fixed;
+    bottom: 0px;
+    z-index: 99999;
+    background-color: ghostwhite;
+    border-radius: 25px;
+    width: 370px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.setter-title {
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.setter-elements {
+    font-weight: bold;
+    padding-bottom: 15px;
+}
+
+.svg-icon {
+  margin-right: 10px;
+}
+
+#path_coords_list {
+    padding-left: 4em;
+    max-height: 300px;
+    overflow-x: hidden;
+}
+
+.btn {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

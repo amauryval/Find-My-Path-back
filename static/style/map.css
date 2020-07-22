@@ -1,0 +1,27 @@
+#map {
+    position:fixed;
+    width:100%;
+    height:100%;
+    z-index:0;
+}
+
+svg circle.PathNodes {
+    r: 10;
+    fill: orange;
+    opacity: 1;
+    stroke: black;
+    stroke-width: 1px;
+    stroke-opacity: 1;
+}
+
+svg circle.PathNodes:first-child {
+    fill: red;
+}
+
+svg circle.PathNodes:last-of-type {
+    fill: green;
+}
+
+svg text.PathNodesText {
+    fill: black;
+}
