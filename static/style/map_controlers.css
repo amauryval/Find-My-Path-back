@@ -5,7 +5,7 @@
     z-index: 99999;
     background-color: ghostwhite;
     border-radius: 25px;
-    width: 370px;
+    width: 400px;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 25px;
@@ -36,3 +36,17 @@
     padding-top: 0px;
     padding-bottom: 0px;
 }
+
+textarea {
+    resize: none;
+}
+
+.centered {
+    margin: auto;
+    height: 25px;
+}
+
+.coords_element {
+    padding-bottom: 10px;
+}
+

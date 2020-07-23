@@ -100,23 +100,60 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
 
     var pointsFound = featuresdata
 
-    var linePoints = g.selectAll(".PathNodes")
+    var PathPointsCircles = g.selectAll(".PathNodes")
         .data(pointsFound)
         .enter()
         .append("circle", ".PathNodes")
-        .attr("class", "PathNodes pulse")
+        .attr("class", "PathNodes")
+        .attr("r", "10")
+        .on('mouseover', function () {
+            map.dragging.disable();
+        })
+        .on('mouseout', function () {
+            map.dragging.enable();
+        })
+        .call(
+            d3.drag()
+                .on("drag", function() {
 
-    // I want names for my coffee and beer
+                    d3.select(this)
+                        .attr("r", "15")
+                        .attr("transform", function (d) {
+                        return "translate(" +
+                            d3.event.x + "," +
+                            d3.event.y + ")";
+                        })
+                })
+                .on("end", function(d) {
+                    console.log("done")
+                    d3.select(this).attr("transform", function (d) {
+                        var new_coordinates = applyLayerToLatLng([d3.event.x, d3.event.y])
+                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coordinate_content').attr("data-x", new_coordinates.lng)
+                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coordinate_content').attr("data-y", new_coordinates.lat)
+                        MapPathNodes()
+                    })
+                }
+            )
+        )
+
     var textPoints = g.selectAll("text")
         .data(pointsFound)
         .enter()
         .append("text")
         .text(function(d) {
-            return d.properties.position
+            let name = d.properties.name
+            let position = d.properties.position
+
+            if (name.length > 0) {
+                return name
+            } else {
+                return position
+            }
         })
         .attr("class", "PathNodesText")
         .attr("text-anchor", "middle")
-        .attr("y", 4.5)
+        .attr("y", -12)
+        .style("cursor", "pointer")
 
     // when the user zooms in or out you need to reset
     // the view
@@ -137,7 +174,7 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
 
         // for the points we need to convert from latlong
         // to map units
-        linePoints.attr("transform",
+        PathPointsCircles.attr("transform",
             function (d) {
                 return "translate(" +
                     applyLatLngToLayer(d).x + "," +
@@ -150,6 +187,8 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
         this.stream.point(point.x, point.y);
     }
 }
+
+
 
 
 function animatePointOnLine(geojson_nodes, id) {
@@ -365,3 +404,9 @@ function applyLatLngToLayer(d) {
     var x = d.geometry.coordinates[0]
     return map.latLngToLayerPoint(new L.LatLng(y, x))
 }
+
+function applyLayerToLatLng(coordinates) {
+    return map.layerPointToLatLng(coordinates)
+
+}
+

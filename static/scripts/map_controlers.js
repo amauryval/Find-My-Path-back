@@ -31,8 +31,11 @@ function PathSetterHandler() {
                     '<div class="row">' +
                         '<div class="col-sm-6">' +
                             '<label class="btn btn-secondary active">' +
-                                '<input id="node_activation" type="checkbox" unchecked autocomplete="off">Activer la saisie' +
+                                '<input id="node_activation" type="checkbox" unchecked autocomplete="off">Edition' +
                             '</label>' +
+                        '</div>' +
+                        '<div class="col-sm-6">' +
+                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Download File</button>' +
                         '</div>' +
                         '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
                             '<ol id="path_coords_list" class="col-sm-12">' +
@@ -63,7 +66,6 @@ $("#path_coords_list").on('click', '.remove a', function(){
     MapPathNodes()
 })
 
-
 $("#path_coords_list").on('click', '.up a', function(){
     var a = $(this).closest('li')
     a.prev().before(a);
@@ -80,43 +82,71 @@ function GetCoordinatesOnClick(e) {
     var node_activation_status = $("#node_activation")
     if ( node_activation_status.is(':checked') ) {
 
+        var coord_data = $('<div class="col-sm-9 input-group coordinate_content">' +
+          // '<div class="input-group-prepend">' +
+            '<span class="centered">Point N°' + ($("#path_coords_list li").length + 1) + '</span>' +
+          // '</div>' +
+          '<textarea class="centered" aria-label="With textarea"></textarea>' +
+        '</div>')
 
-        var coord_data = $('<a class="col-sm-6 coordinate_found">Point N°' + ($("#path_coords_list li").length + 1) + '</a>')
         coord_data.attr("data-x", e.latlng.lng)
         coord_data.attr("data-y", e.latlng.lat)
 
         var coord_info = $(
-            '<div class="row">' +
+            '<div class="row coords_element">' +
                 coord_data[0].outerHTML +
-                '<span class="right remove"><a href="#"><i class="svg-icon fas fa-trash"></i></a></span>' +
-                '<span class="right up"><a href="#"><i class="svg-icon fas fa-arrow-up"></i></a></span>' +
-                '<span class="right down"><a href="#"><i class="svg-icon fas fa-arrow-down"></i></a></span>' +
+                '<span class="centered right remove"><a href="#"><i class="svg-icon fas fa-trash"></i></a></span>' +
+                '<span class="centered right up"><a href="#"><i class="svg-icon fas fa-arrow-up"></i></a></span>' +
+                '<span class="centered right down"><a href="#"><i class="svg-icon fas fa-arrow-down"></i></a></span>' +
             '</div>'
         )
+
+        // to activate keyboard event because we have to wait the page... tricky...
+        $(document).ready(function() {
+            $("textarea").keyup(function (e) {
+                MapPathNodes()
+            });
+        })
 
         $("#path_coords_list").append(
             $('<li>').append(coord_info)
         )
+
+        $('#path_coords_list li').on("mouseover", function (d) {
+            var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]
+            animationNode(svgCircle)
+        });
+        $('#path_coords_list li').on("mouseout", function (d) {
+            var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]
+            $(svgCircle).find("animate").remove()
+        });
+
     }
     MapPathNodes()
 }
 map.on('click', GetCoordinatesOnClick)
 
+var pathNodesData
+
+
 function MapPathNodes() {
-    var pathNodesData = {
+    pathNodesData = {
         "type": "FeatureCollection",
         "features": []
     }
-    $(".coordinate_found").each(function(i) {
-        var coords = $(this).text().split(" ")
+    $(".coordinate_content").each(function(i) {
         pathNodesData.features.push(
             {
                 "type": "Feature",
-                "properties": {"position": i + 1, "id": i},
+                "properties": {
+                    "position": i + 1,
+                    "id": i,
+                    "name":  $(this).find("textarea")[0].value
+                },
                 "geometry": {
                     "type": "Point",
                     "coordinates": [
-                        $(this).attr("data-x"), $(this).attr("data-y")
+                        parseFloat($(this).attr("data-x")), parseFloat($(this).attr("data-y"))
                     ]
                 }
             }
@@ -124,5 +154,50 @@ function MapPathNodes() {
     })
 
     $("#SvgPathNodes").remove()
-    mapPoints(pathNodesData, [0, 100], "SvgPathNodes")
+    var geojson_data = Object.create(pathNodesData);
+    mapPoints(geojson_data, [0, 100], "SvgPathNodes")
+}
+
+
+
+
+
+
+
+
+function downloadNodesPath() {
+    download("nodes_path.geojson",pathNodesData)
+}
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(text)))
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+function animationNode(node) {
+    var rAnim = document.createElementNS("http://www.w3.org/2000/svg", 'animate');
+    rAnim.setAttribute("attributeName", "r");
+    rAnim.setAttribute("from", node.r.baseVal.value);
+    rAnim.setAttribute("to", node.r.baseVal.value * 4);
+    rAnim.setAttribute("dur", "1.5s");
+    rAnim.setAttribute("begin", "0s");
+    rAnim.setAttribute("repeatCount", "indefinite");
+    node.append(rAnim)
+
+    var opacityAnim = document.createElementNS("http://www.w3.org/2000/svg", 'animate');
+    opacityAnim.setAttribute("attributeName", "opacity");
+    opacityAnim.setAttribute("from", "1");
+    opacityAnim.setAttribute("to", "0");
+    opacityAnim.setAttribute("dur", "1.5s");
+    opacityAnim.setAttribute("begin", "0s");
+    opacityAnim.setAttribute("repeatCount", "indefinite");
+    node.append(opacityAnim)
 }
