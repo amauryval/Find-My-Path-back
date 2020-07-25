@@ -114,7 +114,7 @@ function GetCoordinatesOnClick(e) {
 
         $('#path_coords_list li').on("mouseover", function (d) {
             var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]
-            animationNode(svgCircle)
+            // animationNode(svgCircle)
         });
         $('#path_coords_list li').on("mouseout", function (d) {
             var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]

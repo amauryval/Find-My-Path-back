@@ -6,11 +6,15 @@
 }
 
 svg circle.PathNodes {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
     fill: orange;
     opacity: 0.8;
     stroke: black;
     stroke-width: 1px;
     stroke-opacity: 1;
+    font-size: 45px;
+    cursor: pointer;
 }
 
 svg circle.PathNodes:first-child {
@@ -23,7 +27,14 @@ svg circle.PathNodes:last-of-type {
 
 svg text.PathNodesText {
     fill: black;
+    stroke: antiquewhite;
+    stroke-width: 1px;
+    font-size: 30px;
+    font-family: Arial;
+    font-weight: bold;
 }
+
+
 
 
 /*snippet pulse*/

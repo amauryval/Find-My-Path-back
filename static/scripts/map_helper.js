@@ -106,6 +106,10 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
         .append("circle", ".PathNodes")
         .attr("class", "PathNodes")
         .attr("r", "10")
+        // .append('text')
+        //     .attr("class", "PathNodes")
+        //     .text(function(d) { return '\uf3c5'; })
+
         .on('mouseover', function () {
             map.dragging.disable();
         })
@@ -114,8 +118,8 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
         })
         .call(
             d3.drag()
-                .on("drag", function() {
 
+                .on("drag", function() {
                     d3.select(this)
                         .attr("r", "15")
                         .attr("transform", function (d) {
@@ -136,7 +140,7 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
             )
         )
 
-    var textPoints = g.selectAll("text")
+    var textPoints = g.selectAll(".PathNodesText")
         .data(pointsFound)
         .enter()
         .append("text")
@@ -150,10 +154,9 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
                 return position
             }
         })
-        .attr("class", "PathNodesText")
         .attr("text-anchor", "middle")
-        .attr("y", -12)
-        .style("cursor", "pointer")
+        .attr("y", 0)
+        .attr("class", "PathNodesText")
 
     // when the user zooms in or out you need to reset
     // the view
