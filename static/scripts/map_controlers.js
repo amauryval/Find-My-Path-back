@@ -207,7 +207,7 @@ function animationNode(node) {
 
 $("#path_setter_validation").on("click", function() {
 
-    var url_build = `http://127.0.0.1:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,

@@ -1,7 +1,7 @@
-var background_map = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
-	maxZoom: 20,
+var background_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 18,
     minZoom: 8,
-    maxNativeZoom: 15,
+    maxNativeZoom: 18,
 	ext: 'png'
 });
 

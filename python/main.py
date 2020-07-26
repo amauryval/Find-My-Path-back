@@ -25,7 +25,18 @@ class computePath:
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
         self._input_nodes_data["bounds"] = self._input_nodes_data["geometry"].apply(lambda x: ", ".join((map(str, x.bounds))))
-        self._min_x, self._min_y, self._max_x, self._max_y = self._input_nodes_data.geometry.total_bounds
+
+        bound_proceed = self._input_nodes_data.copy(deep=True)
+        bound_proceed.set_crs(epsg=4326, inplace=True)
+        bound_proceed.to_crs(epsg=3857, inplace=True)
+        bound_proceed["geometry"] = bound_proceed.geometry.buffer(100)
+        bound_proceed.to_crs(epsg=4326, inplace=True)
+
+        self._min_x, self._min_y, self._max_x, self._max_y = bound_proceed.geometry.total_bounds
+        print(self._min_x)
+        print(self._min_y)
+        print(self._max_x)
+        print(self._max_y)
 
     def run(self):
         self.prepare_data()
