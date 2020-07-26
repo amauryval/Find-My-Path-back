@@ -114,7 +114,7 @@ function GetCoordinatesOnClick(e) {
 
         $('#path_coords_list li').on("mouseover", function (d) {
             var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]
-            // animationNode(svgCircle)
+            animationNode(svgCircle)
         });
         $('#path_coords_list li').on("mouseout", function (d) {
             var svgCircle = $($("#SvgPathNodes circle")[$(this).index()])[0]
@@ -126,10 +126,11 @@ function GetCoordinatesOnClick(e) {
 }
 map.on('click', GetCoordinatesOnClick)
 
-var pathNodesData
+var pathNodesData;
 
 
 function MapPathNodes() {
+    pathNodesData = null
     pathNodesData = {
         "type": "FeatureCollection",
         "features": []
@@ -140,7 +141,7 @@ function MapPathNodes() {
                 "type": "Feature",
                 "properties": {
                     "position": i + 1,
-                    "id": i,
+                    "topo_uuid": i,
                     "name":  $(this).find("textarea")[0].value
                 },
                 "geometry": {
@@ -201,3 +202,25 @@ function animationNode(node) {
     opacityAnim.setAttribute("repeatCount", "indefinite");
     node.append(opacityAnim)
 }
+
+
+
+$("#path_setter_validation").on("click", function() {
+
+    var url_build = `http://127.0.0.1:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
+
+    $.ajax({
+        url: url_build,
+        async: true,
+        success: function (result) {
+
+            console.log("ah!")
+            d3.selectAll("#SvgPathBuildAnimated").remove()
+            d3.selectAll("#SvgPathBuild").remove()
+                        map._onResize()
+
+            mapLine(result["path"]["data"], "SvgPathBuild")
+            animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
+        },
+    })
+})

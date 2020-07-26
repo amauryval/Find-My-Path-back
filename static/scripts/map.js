@@ -1,5 +1,5 @@
 var background_map = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
-	maxZoom: 13,
+	maxZoom: 20,
     minZoom: 8,
     maxNativeZoom: 15,
 	ext: 'png'

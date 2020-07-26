@@ -192,8 +192,6 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
 }
 
 
-
-
 function animatePointOnLine(geojson_nodes, id) {
 
     // this is not needed right now, but for future we may need
@@ -275,11 +273,10 @@ function animatePointOnLine(geojson_nodes, id) {
         .attr("class", "lineConnect_" + id)
         .style("fill", "none")
         .attr("d", toLine)
-        .style("stroke", "black")
+        .style("stroke", "red")
         // .style("stroke", "white")
         .style("stroke-width", "2")
         .style("opacity", "0")
-
 
     // This will be our traveling circle it will
     // travel along our path
@@ -299,7 +296,6 @@ function animatePointOnLine(geojson_nodes, id) {
         .attr("id", "markerText_" + id)
         .attr("class", "travelMarkerText_" + id)
         // https://fontawesome.com/cheatsheet
-
 
 
     // when the user zooms in or out you need to reset
@@ -324,7 +320,6 @@ function animatePointOnLine(geojson_nodes, id) {
         // cover our features BUT... since you might be using a big
         // circle to represent a 1 dimensional point, the circle
         // might get cut off.
-
         ptFeatures.attr("transform",
             function (d) {
                 return "translate(" +
@@ -369,9 +364,9 @@ function animatePointOnLine(geojson_nodes, id) {
         linePath.transition()
             .duration(7500)
             .attrTween("stroke-dasharray", tweenDash)
-            .on("end", function () {
-                d3.select(this).call(transition);// infinite loop
-            });
+            // .on("end", function () {
+            //     d3.select(this).call(transition);// infinite loop
+            // });
     } //end transition
 
     // this function feeds the attrTween operator above with the
