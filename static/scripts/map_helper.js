@@ -236,13 +236,14 @@ function animatePointOnLine(geojson_nodes, id) {
     // Lat/Long they need to be converted to map units
     // with applyLatLngToLayer
     var toLine = d3.line()
-        //.interpolate("linear")
+        // .interpolate("linear")
         .x(function (d) {
             return applyLatLngToLayer(d).x
         })
         .y(function (d) {
             return applyLatLngToLayer(d).y
-        });
+        })
+        .curve(d3.curveLinear)
 
 
     // From now on we are essentially appending our features to the
@@ -271,12 +272,12 @@ function animatePointOnLine(geojson_nodes, id) {
         .enter()
         .append("path")
         .attr("class", "lineConnect_" + id)
-        .style("fill", "none")
+        .style("fill", "none") // add a color
+        .style("opacity", "unset") // add 0 to hide the path
         .attr("d", toLine)
-        .style("stroke", "red")
+        .style("stroke", "black")
         // .style("stroke", "white")
         .style("stroke-width", "2")
-        .style("opacity", "0")
 
     // This will be our traveling circle it will
     // travel along our path

@@ -219,7 +219,7 @@ $("#path_setter_validation").on("click", function() {
             d3.selectAll("#SvgPathBuild").remove()
                         map._onResize()
 
-            mapLine(result["path"]["data"], "SvgPathBuild")
+            // mapLine(result["path"]["data"], "SvgPathBuild")
             animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
         },
     })

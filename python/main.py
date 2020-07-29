@@ -12,9 +12,29 @@ import geopandas as gpd
 from shapely.ops import linemerge
 from shapely.geometry import mapping
 from shapely.geometry import Point
+from shapely.geometry import LineString
 from shapely.wkt import loads
 import pandas as pd
+from operator import itemgetter
+from shapely.ops import cascaded_union
 
+
+
+def multilinestring_continuity(multilinestring):
+
+    """
+
+    :param multilinestring: MultiLineString with different orientations
+    :type multilinestring: shapely.geometry.MultiLineString
+    :return: re-oriented MultiLineSting
+    :rtype: shapely.geometry.MultiLineString
+    """
+
+    dict_line = {key: value for key, value in enumerate(multilinestring)}
+    for key, line in dict_line.items():
+        if key != 0 and dict_line[key - 1].coords[-1] == line.coords[-1]:
+            dict_line[key] = LineString(line.coords[::-1])
+    return [v for _, v in dict_line.items()]
 
 class computePath:
 
@@ -29,7 +49,7 @@ class computePath:
         bound_proceed = self._input_nodes_data.copy(deep=True)
         bound_proceed.set_crs(epsg=4326, inplace=True)
         bound_proceed.to_crs(epsg=3857, inplace=True)
-        bound_proceed["geometry"] = bound_proceed.geometry.buffer(100)
+        bound_proceed["geometry"] = bound_proceed.geometry.buffer(500)
         bound_proceed.to_crs(epsg=4326, inplace=True)
 
         self._min_x, self._min_y, self._max_x, self._max_y = bound_proceed.geometry.total_bounds
@@ -41,7 +61,7 @@ class computePath:
     def run(self):
         self.prepare_data()
         self.compute_path()
-
+        points_data = self.compute_points_data()
         # return {
         #     "type": "FeatureCollection",
         #     "features": [
@@ -56,18 +76,41 @@ class computePath:
         # }
         return {
             # "length": float(self._total_length),
-            "data": {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "properties": {},
-                        "geometry": mapping(loads(node))
+            "data": points_data
+        }
 
-                    }
-                    for node in self._output_path
-                ]
-            }
+    def compute_points_data(self):
+
+        # paths_merged = linemerge(self._output_path)
+        paths_merged = self._output_path
+
+        path = []
+        for path_found in paths_merged:
+            coordinates = path_found.coords
+            for coord in coordinates:
+                # if coord not in path:
+                path.append(coord)
+        paths_merged = LineString(path)
+        print(paths_merged)
+        # for f in paths_merged:
+        #     print("PATH", f)
+        # paths_merged = linemerge(paths_merged)
+
+
+        # print(paths_merged.wkt, self._start_node.wkt)
+        # if paths_merged.coords[0] != self._start_node.coords[0]:
+        #     paths_merged = LineString(paths_merged.coords[::-1])
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": mapping(Point(coords))
+
+                }
+                for coords in paths_merged.coords
+            ]
         }
 
     def compute_path(self):
@@ -80,18 +123,23 @@ class computePath:
 
         graph = network_from_web_found_topology_fixed.get_graph()
         network_gdf = network_from_web_found_topology_fixed.get_gdf()
+
         print("aaaa", self._input_nodes_data.shape, network_gdf.shape)
+        self._start_node = self._input_nodes_data.loc[self._input_nodes_data["position"] == 1]["geometry"].iloc[0]
         nodes_path = [
             {
-                "position": row["position"], "geometry": row["geometry"].wkt
+                "position": int(row["position"]), "geometry": row["geometry"].wkt
             }
             for _, row in self._input_nodes_data.iterrows()
         ]
-        paths_to_compute = list(zip(nodes_path, nodes_path[1:]))
+        # print(nodes_path)
+        nodes_path_ordered = sorted(nodes_path, key=itemgetter('position'), reverse=False)
+        paths_to_compute = list(zip(nodes_path_ordered, nodes_path_ordered[1:]))
+        # print("paaths", paths_to_compute)
 
         self._output_path = []
-        for start_node, end_node in paths_to_compute:
-            print("a")
+        path_ids = []
+        for enum, (start_node, end_node) in enumerate(paths_to_compute):
             source_vertex = graph.find_vertex_from_name(start_node["geometry"])
             target_vertex = graph.find_vertex_from_name(end_node["geometry"])
 
@@ -101,24 +149,33 @@ class computePath:
                 target=target_vertex,
                 weights=graph.edge_weights
             )
+            print(enum, path_edges)
+            print()
 
+            shortest_path_gdf = network_gdf.copy(deep=True)
             # # get path by using edge names
-            # path_ids = [
-            #     graph.edge_names[edge]
-            #     for edge in path_edges
-            # ]
-            # shortest_path = network_gdf.copy(deep=True)
-            # shortest_path = shortest_path[shortest_path['topo_uuid'].isin(path_ids)]
+            for edge in path_edges:
+                path_ids.append(graph.edge_names[edge])
+
+            # print("GDF", len(shortest_path_gdf))
+            # shortest_path_gdf = shortest_path_gdf[shortest_path_gdf['topo_uuid'].isin(path_ids)]
             # self._total_length = sum(shortest_path.geometry.length.to_list())
 
             # get path by using nodes names
-            path_ids = [
-                graph.vertex_names[vertex]
-                for vertex in path_vertices
-            ]
-            nodes_wkt = pd.Series(path_ids).drop_duplicates().tolist()
+            # path_ids = [
+            #     graph.vertex_names[vertex]
+            #     for vertex in path_vertices
+            # ]
+            # nodes_wkt = pd.Series(path_ids).drop_duplicates().tolist()
 
-            self._output_path.extend(nodes_wkt)
+            # self._output_path.extend(nodes_wkt)
+            # for f in shortest_path_gdf["geometry"]:
+            #     print(f.wkt)
+            #     self._output_path.append(f)
+        for path_id in path_ids:
+            print(path_id)
+            self._output_path.append(shortest_path_gdf[shortest_path_gdf['topo_uuid'] == path_id]["geometry"].iloc[0])
+
 
 def app():
 
@@ -141,24 +198,24 @@ def app():
         url_arg_keys = {
             "geojson": request.args.get('geojson', type=str, default="aaaa"),
         }
-        try:
-            data = computePath(
-                geojson=url_arg_keys["geojson"]
-            ).run()
+        # try:
+        data = computePath(
+            geojson=url_arg_keys["geojson"]
+        ).run()
 
-            output = jsonify(
-                {
-                    "path": data
-                }
-            )
+        output = jsonify(
+            {
+                "path": data
+            }
+        )
 
-            output.headers.add('Access-Control-Allow-Origin', '*')
+        output.headers.add('Access-Control-Allow-Origin', '*')
 
-            return output
+        return output
 
-        except (ValueError) as err:
-            err = repr(err)
-            return bad_request(err, 400)
+        # except (ValueError) as err:
+        #     err = repr(err)
+        #     return bad_request(err, 400)
 
     app = Flask(__name__)
     CORS(app)
