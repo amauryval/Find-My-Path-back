@@ -213,14 +213,18 @@ $("#path_setter_validation").on("click", function() {
         url: url_build,
         async: true,
         success: function (result) {
+            if (typeof result["path"] === 'string' || result["path"] instanceof String) {
+                alert(result["path"])
+            } else {
+                console.log("ah!")
+                d3.selectAll("#SvgPathBuildAnimated").remove()
+                d3.selectAll("#SvgPathBuild").remove()
+                map._onResize()
 
-            console.log("ah!")
-            d3.selectAll("#SvgPathBuildAnimated").remove()
-            d3.selectAll("#SvgPathBuild").remove()
-                        map._onResize()
+                // mapLine(result["path"]["data"], "SvgPathBuild")
+                animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
+            }
 
-            // mapLine(result["path"]["data"], "SvgPathBuild")
-            animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
         },
     })
 })

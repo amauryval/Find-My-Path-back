@@ -36,6 +36,11 @@ def multilinestring_continuity(multilinestring):
             dict_line[key] = LineString(line.coords[::-1])
     return [v for _, v in dict_line.items()]
 
+
+class ReduceYouPathArea(Exception):
+    pass
+
+
 class computePath:
 
     def __init__(self, geojson):
@@ -50,9 +55,15 @@ class computePath:
         bound_proceed.set_crs(epsg=4326, inplace=True)
         bound_proceed.to_crs(epsg=3857, inplace=True)
         bound_proceed["geometry"] = bound_proceed.geometry.buffer(500)
-        bound_proceed.to_crs(epsg=4326, inplace=True)
 
+        bbox_3857 = bound_proceed.geometry.total_bounds
+        min_x, min_y, max_x, max_y = bbox_3857
+        if LineString([(min_x, min_y), (max_x, max_y)]).length > 10000:
+            raise ReduceYouPathArea()
+
+        bound_proceed.to_crs(epsg=4326, inplace=True)
         self._min_x, self._min_y, self._max_x, self._max_y = bound_proceed.geometry.total_bounds
+
         print(self._min_x)
         print(self._min_y)
         print(self._max_x)
@@ -198,24 +209,30 @@ def app():
         url_arg_keys = {
             "geojson": request.args.get('geojson', type=str, default="aaaa"),
         }
-        # try:
-        data = computePath(
-            geojson=url_arg_keys["geojson"]
-        ).run()
 
-        output = jsonify(
-            {
-                "path": data
-            }
-        )
+        try:
+            data = computePath(
+                geojson=url_arg_keys["geojson"]
+            ).run()
 
-        output.headers.add('Access-Control-Allow-Origin', '*')
+            output = jsonify(
+                {
+                    "path": data
+                }
+            )
 
-        return output
-
+        except ReduceYouPathArea as _:
+            output = jsonify(
+                {
+                    "path": "Reduce your path. Overpass api could be angry ;)"
+                }
+            )
         # except (ValueError) as err:
         #     err = repr(err)
         #     return bad_request(err, 400)
+
+        output.headers.add('Access-Control-Allow-Origin', '*')
+        return output
 
     app = Flask(__name__)
     CORS(app)
