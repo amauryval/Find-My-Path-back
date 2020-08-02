@@ -35,7 +35,7 @@ function PathSetterHandler() {
                             '</label>' +
                         '</div>' +
                         '<div class="col-sm-6">' +
-                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Download File</button>' +
+                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Download nodes</button>' +
                         '</div>' +
                         '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
                             '<ol id="path_coords_list" class="col-sm-12">' +
@@ -207,7 +207,7 @@ $("#path_setter_validation").on("click", function() {
         async: true,
         success: function (result) {
             if (typeof result["path"] === 'string' || result["path"] instanceof String) {
-                alert(result["path"])
+                alert("Reduce your working area (max 10km). Overpass api and heroku could be very angry ;)")
             } else {
                 console.log("ah!")
                 d3.selectAll("#SvgPathBuildAnimated").remove()
