@@ -159,13 +159,6 @@ function MapPathNodes() {
     mapPoints(geojson_data, [0, 100], "SvgPathNodes")
 }
 
-
-
-
-
-
-
-
 function downloadNodesPath() {
     download("nodes_path.geojson",pathNodesData)
 }

@@ -18,4 +18,7 @@ ENV PATH /opt/conda/envs/osmgt/bin:$PATH
 COPY /python /home/app/
 
 EXPOSE 5000
-CMD ["python", "main.py"]
+ENTRYPOINT ["python"]
+CMD ["main.py"]
+#CMD ["python", "main.py"]
+#CMD ["gunicorn main:app --log-file=-"]

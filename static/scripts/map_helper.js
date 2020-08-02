@@ -1,77 +1,3 @@
-function mapLine(geojson_nodes, id) {
-
-    var featuresdata = geojson_nodes.features
-
-    featuresdata.forEach(function (feature, i) {
-        feature.LatLng = new L.LatLng(
-            feature.geometry.coordinates[1],
-            feature.geometry.coordinates[0]
-        )
-    })
-    var new_svg = L.svg().addTo(map);
-    var svg = d3.select(new_svg._container).attr("id", id);
-    var g = svg.append("g").attr("class", "leaflet-zoom-hide path");
-
-    // WARNING disabled after add svg with leaflet method...
-    var transform = d3.geoTransform({
-        point: projectPoint
-    });
-    // WARNING disabled after add svg with leaflet method...
-    var d3path = d3.geoPath().projection(transform);
-
-
-    var toLine = d3.line()
-        //.interpolate("linear")
-        .x(function (d) {
-            return applyLatLngToLayer(d).x
-        })
-        .y(function (d) {
-            return applyLatLngToLayer(d).y
-        });
-
-    // draw the line
-    var linePathDrawn = g.selectAll(".lineDrawn")
-        .data([featuresdata])
-        .enter().append("path")
-        .attr("class", "lineDrawn")
-        .attr("d", toLine)
-        .style("fill", "none")
-        .style("stroke", "black")
-        .style("stroke-width", "5")
-        .style("opacity", "1");
-
-    // when the user zooms in or out you need to reset
-    // the view
-    map.on("zoom", reset);
-
-    // this puts stuff on the map!
-    reset();
-
-    // Reposition the SVG to cover the features.
-    function reset() {
-        // WARNING disabled after add svg with leaflet method...
-        // var bounds = d3path.bounds(geojson_nodes),
-        //     topLeft = bounds[0],
-        //     bottomRight = bounds[1];
-        // // Setting the size and location of the overall SVG container
-        // svg.attr("width", bottomRight[0] - topLeft[0] + 120)
-        //     .attr("height", bottomRight[1] - topLeft[1] + 120)
-        //     .style("left", topLeft[0] - 50 + "px")
-        //     .style("top", topLeft[1] - 50 + "px");
-
-        linePathDrawn.attr("d", toLine)
-        // WARNING disabled after add svg with leaflet method...
-        // g.attr("transform", "translate(" + (-topLeft[0] + 50) + "," + (-topLeft[1] + 50) + ")");
-
-    }
-
-    function projectPoint(x, y) {
-        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
-        this.stream.point(point.x, point.y);
-    } //end projectPoint
-}
-
-
 function mapPoints(geojson_nodes, idxToSelect, id) {
     var featuresdata = geojson_nodes.features
 
@@ -194,10 +120,6 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
 
 function animatePointOnLine(geojson_nodes, id) {
 
-    // this is not needed right now, but for future we may need
-    // to implement some filtering. This uses the d3 filter function
-    // featuresdata is an array of point objects
-
     var featuresdata = geojson_nodes.features
 
     featuresdata.forEach(function (feature, i) {
@@ -207,9 +129,7 @@ function animatePointOnLine(geojson_nodes, id) {
         )
     })
 
-    // if you don't include the leaflet-zoom-hide when a
-    // user zooms in or out you will still see the phantom
-    // original SVG
+    // leaflet-zoom-hide needed to avoid the phantom original SVG
     var new_svg = L.svg().addTo(map);
     var svg = d3.select(new_svg._container).attr("id", id);
     var g = svg.append("g").attr("class", "leaflet-zoom-hide path_" + id);
@@ -218,7 +138,6 @@ function animatePointOnLine(geojson_nodes, id) {
     //stream transform. transforms geometry before passing it to
     // listener. Can be used in conjunction with d3.geoPath
     // to implement the transform.
-
     var transform = d3.geoTransform({
         point: projectPoint
     });
@@ -348,8 +267,9 @@ function animatePointOnLine(geojson_nodes, id) {
                     map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
                     map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
             });
+
         // WARNING disabled after add svg with leaflet method...
-        // Setting the size and location of the overall SVG container
+        // size and location of the overall SVG container
         // svg.attr("width", bottomRight[0] - topLeft[0] + 120)
         //     .attr("height", bottomRight[1] - topLeft[1] + 120)
         //     .style("left", topLeft[0] - 50 + "px")
@@ -368,7 +288,7 @@ function animatePointOnLine(geojson_nodes, id) {
             // .on("end", function () {
             //     d3.select(this).call(transition);// infinite loop
             // });
-    } //end transition
+    }
 
     // this function feeds the attrTween operator above with the
     // stroke and dash lengths
@@ -390,12 +310,12 @@ function animatePointOnLine(geojson_nodes, id) {
 
             return interpolate(t);
         }
-    } //end tweenDash
+    }
 
     function projectPoint(x, y) {
         var point = map.latLngToLayerPoint(new L.LatLng(y, x));
         this.stream.point(point.x, point.y);
-    } //end projectPoint
+    }
 }
 
 function applyLatLngToLayer(d) {
