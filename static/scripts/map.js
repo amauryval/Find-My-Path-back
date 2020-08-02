@@ -1,19 +1,23 @@
+
+var max_zoom = 17
+var min_zoom = 12
+
 var background_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 18,
-    minZoom: 8,
-    maxNativeZoom: 18,
+	maxZoom: max_zoom,
+    minZoom: min_zoom,
+    maxNativeZoom: max_zoom,
 	ext: 'png'
 });
 
 var map = L.map(
     'map',
      {
-     	zoom: 6,
-        zoomControl: false
+     	zoom: min_zoom,
+        zoomControl: true
      }
 ).addLayer(background_map).setView(
-	[44.896741, 4.932861],
-	8,
+	[45.754649, 4.858618],
+	10,
 );
 
 $('.leaflet-bottom.leaflet-right').insertAfter('.leaflet-top.leaflet-right');

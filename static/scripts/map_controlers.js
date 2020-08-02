@@ -215,6 +215,9 @@ $("#path_setter_validation").on("click", function() {
                 map._onResize()
 
                 // mapLine(result["path"]["data"], "SvgPathBuild")
+
+                map.fitBounds(L.geoJson(result["path"]["data"]).getBounds());
+
                 animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
             }
 

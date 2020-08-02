@@ -162,7 +162,7 @@ function animatePointOnLine(geojson_nodes, id) {
         .y(function (d) {
             return applyLatLngToLayer(d).y
         })
-        .curve(d3.curveLinear)
+        // .curve(d3.curveLinear)
 
 
     // From now on we are essentially appending our features to the
@@ -193,10 +193,11 @@ function animatePointOnLine(geojson_nodes, id) {
         .attr("class", "lineConnect_" + id)
         .style("fill", "none") // add a color
         .style("opacity", "unset") // add 0 to hide the path
-        .attr("d", toLine)
+        // .attr("d", toLine)
         .style("stroke", "black")
         // .style("stroke", "white")
         .style("stroke-width", "2")
+        .style("overflow", "overlay")
 
     // This will be our traveling circle it will
     // travel along our path
@@ -220,7 +221,7 @@ function animatePointOnLine(geojson_nodes, id) {
 
     // when the user zooms in or out you need to reset
     // the view
-    map.on("zoom", reset);
+    map.on("moveend", reset);
 
     // this puts stuff on the map!
     reset();
@@ -276,6 +277,7 @@ function animatePointOnLine(geojson_nodes, id) {
         //     .style("top", topLeft[1] - 50 + "px");
 
         linePath.attr("d", toLine)
+
         // WARNING disabled after add svg with leaflet method...
         // g.attr("transform", "translate(" + (-topLeft[0] + 50) + "," + (-topLeft[1] + 50) + ")");
 
