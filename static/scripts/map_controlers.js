@@ -142,6 +142,7 @@ function MapPathNodes() {
                 "properties": {
                     "position": i + 1,
                     "topo_uuid": i,
+                    "id": i,
                     "name":  $(this).find("textarea")[0].value
                 },
                 "geometry": {

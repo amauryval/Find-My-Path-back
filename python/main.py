@@ -131,6 +131,7 @@ class computePath:
 
         network_from_web_found_topology_fixed = OsmGt.roads_from_bbox(
             (self._min_y, self._min_x, self._max_y, self._max_x),
+            "vehicle",
             self._input_nodes_data
         )
 
