@@ -62,7 +62,9 @@ function PathSetterHandler() {
                         '<div class="col-sm-12">' +
                             '<button class="btn btn-secondary" onclick="downloadNodesPath()">Export nodes</button>' +
                         '</div>' +
-
+                        '<div class="col-sm-12">' +
+                            '<button class="btn btn-secondary" onclick="downloadPath()">Export path</button>' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
             '</div>' +
@@ -146,7 +148,7 @@ function GetCoordinatesOnClick(e) {
 map.on('click', GetCoordinatesOnClick)
 
 var pathNodesData;
-
+var pathData;
 
 function MapPathNodes() {
     pathNodesData = null
@@ -180,8 +182,18 @@ function MapPathNodes() {
 }
 
 function downloadNodesPath() {
-    download("nodes_path.geojson",pathNodesData)
+    if (pathNodesData.type === "FeatureCollection") {
+        download("nodes_path.geojson", pathNodesData)
+    }
 }
+
+function downloadPath() {
+    if (pathData.type === "FeatureCollection") {
+        download("path.geojson", pathData)
+    }
+
+}
+
 
 function download(filename, text) {
   var element = document.createElement('a');
@@ -245,12 +257,12 @@ $("#path_setter_validation").on("click", function() {
                 d3.selectAll("#SvgPathBuildAnimated").remove()
                 d3.selectAll("#SvgPathBuild").remove()
                 map._onResize()
-
+                pathData = result["path"]["data"]
                 // mapLine(result["path"]["data"], "SvgPathBuild")
 
-                map.fitBounds(L.geoJson(result["path"]["data"]).getBounds());
+                map.fitBounds(L.geoJson(pathData).getBounds());
 
-                animatePointOnLine(result["path"]["data"], "SvgPathBuildAnimated")
+                animatePointOnLine(pathData, "SvgPathBuildAnimated")
             }
 
         },
