@@ -19,7 +19,7 @@ from shapely.wkt import loads
 import pandas as pd
 from operator import itemgetter
 from shapely.ops import cascaded_union
-
+from graph_tool.topology import shortest_path
 
 
 def multilinestring_continuity(multilinestring):
@@ -128,8 +128,6 @@ class computePath:
         }
 
     def compute_path(self):
-        from graph_tool.topology import shortest_path
-
         network_from_web_found_topology_fixed = OsmGt.roads_from_bbox(
             (self._min_y, self._min_x, self._max_y, self._max_x),
             self._mode,
@@ -217,6 +215,7 @@ def app():
 
         try:
             data = computePath(
+                mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"]
             ).run()
 
