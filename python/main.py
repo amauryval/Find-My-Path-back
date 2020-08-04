@@ -98,6 +98,9 @@ class computePath:
         # paths_merged = linemerge(self._output_path)
         paths_merged = self._output_path
 
+        if self._mode == "pedestrian":
+            paths_merged = multilinestring_continuity(paths_merged)
+
         path = []
         for path_found in paths_merged:
             coordinates = path_found.coords
@@ -209,7 +212,7 @@ def app():
     def get_eq_data():
 
         url_arg_keys = {
-            "mode": request.args.get('mode' , type=str) ,
+            "mode": request.args.get('mode', type=str) ,
             "geojson": request.args.get('geojson', type=str),
         }
 
