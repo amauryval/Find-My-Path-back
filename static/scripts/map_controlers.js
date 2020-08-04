@@ -219,9 +219,7 @@ function animationNode(node) {
 
 
 $("#path_setter_validation").on("click", function() {
-    // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://test-animated-path.herokuapp.com/api/v1/data?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
-
+    // mode selection
     var mode_vehicle = $('#mode_vehicle')
     var mode_pedestrian = $('#mode_pedestrian')
     if ( mode_vehicle.is(':checked') ) {
@@ -233,6 +231,8 @@ $("#path_setter_validation").on("click", function() {
         return
     }
 
+    // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/data?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
