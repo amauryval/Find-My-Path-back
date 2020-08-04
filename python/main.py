@@ -45,9 +45,10 @@ class ReduceYouPathArea(Exception):
 
 class computePath:
 
-    def __init__(self, geojson):
+    def __init__(self, geojson, mode):
 
         self._geojson = json.loads(geojson)
+        self._mode = mode
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
@@ -131,7 +132,7 @@ class computePath:
 
         network_from_web_found_topology_fixed = OsmGt.roads_from_bbox(
             (self._min_y, self._min_x, self._max_y, self._max_x),
-            "vehicle",
+            self._mode,
             self._input_nodes_data
         )
 
@@ -210,7 +211,8 @@ def app():
     def get_eq_data():
 
         url_arg_keys = {
-            "geojson": request.args.get('geojson', type=str, default="aaaa"),
+            "mode": request.args.get('mode' , type=str) ,
+            "geojson": request.args.get('geojson', type=str),
         }
 
         try:
