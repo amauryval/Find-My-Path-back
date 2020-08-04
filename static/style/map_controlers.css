@@ -1,25 +1,58 @@
 
+.legend-object {
+    padding-bottom: 20px;
+}
+
+.legend-title {
+    /* bottom: 90%; */
+    /* width: 100%; */
+    /* height: 100%; */
+    z-index: 20;
+    background-color: darkorange;
+    border-radius: 25px;
+    width: fit-content;
+    padding-top: 10px;
+    /* padding-bottom: 10px; */
+    /* padding-left: 25px; */
+    /* padding-right: 25px; */
+    position: absolute;
+    top: -20px;
+    left: 20px;
+}
+
 .legend {
-    position: fixed;
+    /* position: fixed; */
     bottom: 0px;
-    z-index: 99999;
+    z-index: 10;
     background-color: ghostwhite;
     border-radius: 25px;
     width: 400px;
-    padding-top: 10px;
+    padding-top: 30px;
     padding-bottom: 10px;
     padding-left: 25px;
     padding-right: 25px;
+    box-shadow: 10px 5px 5px #6c757d;
 }
 
 .setter-title {
+    font-size: larger;
     font-weight: bold;
     padding-bottom: 10px;
+}
+
+.btn {
+    margin-left: 10px;
+}
+
+.setter-sub-title {
+    font-weight: bold;
+    padding-left: unset;
 }
 
 .setter-elements {
     font-weight: bold;
     padding-bottom: 15px;
+    margin: auto;
 }
 
 .svg-icon {

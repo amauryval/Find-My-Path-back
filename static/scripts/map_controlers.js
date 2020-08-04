@@ -1,9 +1,12 @@
 function ViewSetterHandler() {
     var controler = $(
-        '<div id="view_setter" class="legend container leaflet-control">' +
-            '<div id="view-setter-container" class="row">' +
+        '<div id="view_setter" class="container leaflet-control legend-object">' +
+            '<div id="view-setter-container-title-container" class="row legend-title">' +
                 '<div class="setter-title col-sm-12">Afficher un territoire</div>' +
-                '<div class="setter-elements col-sm-12">' +
+            '</div>' +
+            '<div id="view-setter-container" class="row">' +
+                '<div class="setter-elements col-sm-1"></div>' +
+                '<div class="setter-elements col-sm-11 legend">' +
                     '<div class="row">' +
                         '<div class="col-sm-8">' +
                             '<input class="input-xlarge" id="focusedInput" type="text" value="Saisir votre territoire...">' +
@@ -22,48 +25,68 @@ function ViewSetterHandler() {
 
 function PathSetterHandler() {
     var controler = $(
-        '<div id="path_setter" class="legend container leaflet-control">' +
-            '<div id="path-setter-container" class="row">' +
-                '<div class="setter-title col-sm-12">Définisser votre chemin</div>' +
-                '<div class="setter-elements col-sm-12">' +
+        '<div id="path_setter" class="container leaflet-control legend-object">' +
+            '<div id="path-setter-container-title-container" class="row legend-title">' +
+                '<div class="setter-title col-sm-12">Définir un chemin</div>' +
+            '</div>' +
+
+            '<div id="view-setter-container" class="row">' +
+                 '<div class="setter-elements col-sm-1"></div>' +
+                 '<div class="setter-elements col-sm-11 legend">' +
                     '<div class="row">' +
-
-                         '<div class="col-sm-12">' +
-                             '<div class="setter-sub-title col-sm-12">Choisissez le mode</div>' +
-                             '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
-                                '<label class="btn btn-secondary active">' +
-                                    '<input type="radio" name="mode_options" value="pedestrian" id="mode_pedestrian" autocomplete="off" checked>pedestrian' +
-                                '</label>' +
-                                '<label class="btn btn-secondary">' +
-                                    '<input type="radio" name="mode_options" id="mode_vehicle" value="vehicle" autocomplete="off">vehicle' +
-                                '</label>' +
+                        '<div class="setter-elements col-sm-8">' +
+                            '<div class="setter-elements col-sm-12">' +
+                                 '<div class="setter-sub-title col-sm-12">Choisissez le mode</div>' +
+                                 '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
+                                    '<label class="btn btn-secondary active">' +
+                                        '<input type="radio" name="mode_options" value="pedestrian" id="mode_pedestrian" autocomplete="off" checked>pedestrian' +
+                                    '</label>' +
+                                    '<label class="btn btn-secondary">' +
+                                        '<input type="radio" name="mode_options" id="mode_vehicle" value="vehicle" autocomplete="off">vehicle' +
+                                    '</label>' +
+                                 '</div>' +
+                            '</div>' +
+                            '<div class="setter-elements col-sm-12">' +
+                                '<div class="setter-sub-title col-sm-12">Activer le mode édition</div>' +
+                                '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
+                                    '<label class="btn btn-secondary active">' +
+                                        '<input id="edition_mode" type="checkbox" unchecked autocomplete="off">Edition' +
+                                    '</label>' +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
 
-                        '<div class="col-sm-12">' +
-                            '<div class="setter-sub-title col-sm-12">Créer un chemin</div>' +
-                            '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
-                                '<label class="btn btn-secondary active">' +
-                                    '<input id="edition_mode" type="checkbox" unchecked autocomplete="off">Edition' +
-                                '</label>' +
-                            '</div>' +
+                        '<div class="setter-elements col-sm-4">' +
+                            '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
                         '</div>' +
 
-                        '<div class="col-sm-12">' +
+                        '<div class="setter-elements col-sm-12">' +
                             '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
-                                '<ol id="path_coords_list" class="col-sm-12">' +
-                                '</ol>' +
-                            '</div>' +
-                            '<div class="col-sm-6">' +
-                                '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
-                            '</div>' +
+                            '<ol id="path_coords_list" class="col-sm-12"></ol>' +
                         '</div>' +
+                    '</div>' +
+                 '</div>' +
+            '</div>' +
+        '</div>'
+    )
+    $(".leaflet-bottom.leaflet-left").append(controler)
+}
 
-                        '<div class="col-sm-12">' +
-                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Export nodes</button>' +
+function DownloadSetterHandler() {
+    var controler = $(
+        '<div id="download_setter" class="container leaflet-control legend-object">' +
+            '<div id="view-setter-container-title-container" class="row legend-title">' +
+                '<div class="setter-title col-sm-12">Exporter les résultats</div>' +
+            '</div>' +
+            '<div id="view-setter-container" class="row">' +
+                '<div class="setter-elements col-sm-1"></div>' +
+                '<div class="setter-elements col-sm-11 legend">' +
+                    '<div class="row">' +
+                        '<div class="setter-elements col-sm-6">' +
+                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Export des noeuds</button>' +
                         '</div>' +
-                        '<div class="col-sm-12">' +
-                            '<button class="btn btn-secondary" onclick="downloadPath()">Export path</button>' +
+                        '<div class="setter-elements col-sm-6">' +
+                            '<button class="btn btn-secondary" onclick="downloadPath()">Export du chemin</button>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
@@ -75,6 +98,7 @@ function PathSetterHandler() {
 
 ViewSetterHandler()
 PathSetterHandler()
+DownloadSetterHandler()
 
 // to disable click map on map divs
 $(".legend").each(function () {
@@ -148,7 +172,7 @@ function GetCoordinatesOnClick(e) {
 map.on('click', GetCoordinatesOnClick)
 
 var pathNodesData;
-var pathData;
+var linePathData;
 
 function MapPathNodes() {
     pathNodesData = null
@@ -188,8 +212,8 @@ function downloadNodesPath() {
 }
 
 function downloadPath() {
-    if (pathData.type === "FeatureCollection") {
-        download("path.geojson", pathData)
+    if (linePathData.type === "FeatureCollection") {
+        download("path.geojson", linePathData)
     }
 
 }
@@ -250,19 +274,21 @@ $("#path_setter_validation").on("click", function() {
         url: url_build,
         async: true,
         success: function (result) {
-            if (typeof result["path"] === 'string' || result["path"] instanceof String) {
+            if (typeof result["points_path"] === 'string' || result["points_path"] instanceof String) {
                 alert("Reduce your working area (max 10km). Overpass api and heroku could be very angry ;)")
             } else {
                 console.log("ah!")
                 d3.selectAll("#SvgPathBuildAnimated").remove()
                 d3.selectAll("#SvgPathBuild").remove()
                 map._onResize()
-                pathData = result["path"]["data"]
+                linePathData = result["line_path"]
+                var PointPathData = result["points_path"]
+
                 // mapLine(result["path"]["data"], "SvgPathBuild")
 
-                map.fitBounds(L.geoJson(pathData).getBounds());
+                map.fitBounds(L.geoJson(PointPathData).getBounds());
 
-                animatePointOnLine(pathData, "SvgPathBuildAnimated")
+                animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
             }
 
         },

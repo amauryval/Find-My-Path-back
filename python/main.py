@@ -75,48 +75,27 @@ class computePath:
     def run(self):
         self.prepare_data()
         self.compute_path()
-        points_data = self.compute_points_data()
-        # return {
-        #     "type": "FeatureCollection",
-        #     "features": [
-        #         {
-        #             "type": "Feature",
-        #             "properties": {
-        #                 "length": float(self._output_path.length)
-        #             },
-        #             "geometry": mapping(self._output_path)
-        #         }
-        #     ]
-        # }
-        return {
-            # "length": float(self._total_length),
-            "data": points_data
-        }
+        points_data = self.format_data()
+        geojson_points_data = self.to_geojson_points(points_data)
+        geojson_line_data = self.to_geojson_linestring(points_data)
 
-    def compute_points_data(self):
+        return geojson_points_data, geojson_line_data
 
-        # paths_merged = linemerge(self._output_path)
-        paths_merged = self._output_path
-
+    def format_data(self):
         if self._mode == "pedestrian":
-            paths_merged = multilinestring_continuity(paths_merged)
+            paths_merged = multilinestring_continuity(self._output_path)
 
-        path = []
+        points_path = []
         for path_found in paths_merged:
             coordinates = path_found.coords
             for coord in coordinates:
                 # if coord not in path:
-                path.append(coord)
-        paths_merged = LineString(path)
-        print(paths_merged)
-        # for f in paths_merged:
-        #     print("PATH", f)
-        # paths_merged = linemerge(paths_merged)
+                points_path.append(coord)
 
+        return points_path
 
-        # print(paths_merged.wkt, self._start_node.wkt)
-        # if paths_merged.coords[0] != self._start_node.coords[0]:
-        #     paths_merged = LineString(paths_merged.coords[::-1])
+    def to_geojson_points(self, points_path):
+
         return {
             "type": "FeatureCollection",
             "features": [
@@ -126,7 +105,26 @@ class computePath:
                     "geometry": mapping(Point(coords))
 
                 }
-                for coords in paths_merged.coords
+                for coords in points_path
+            ]
+        }
+
+    def to_geojson_linestring(self, points_path):
+
+        linestring_path = LineString(points_path)
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "from_id": self._input_nodes_data.iloc[0]["id"],
+                        "to_id": self._input_nodes_data.iloc[-1]["id"],
+                        "length": linestring_path.length
+                    },
+                    "geometry": mapping(linestring_path)
+
+                }
             ]
         }
 
@@ -148,10 +146,8 @@ class computePath:
             }
             for _, row in self._input_nodes_data.iterrows()
         ]
-        # print(nodes_path)
         nodes_path_ordered = sorted(nodes_path, key=itemgetter('position'), reverse=False)
         paths_to_compute = list(zip(nodes_path_ordered, nodes_path_ordered[1:]))
-        # print("paaths", paths_to_compute)
 
         self._output_path = []
         path_ids = []
@@ -166,28 +162,12 @@ class computePath:
                 weights=graph.edge_weights
             )
             print(enum, path_edges)
-            print()
 
             shortest_path_gdf = network_gdf.copy(deep=True)
             # # get path by using edge names
             for edge in path_edges:
                 path_ids.append(graph.edge_names[edge])
 
-            # print("GDF", len(shortest_path_gdf))
-            # shortest_path_gdf = shortest_path_gdf[shortest_path_gdf['topo_uuid'].isin(path_ids)]
-            # self._total_length = sum(shortest_path.geometry.length.to_list())
-
-            # get path by using nodes names
-            # path_ids = [
-            #     graph.vertex_names[vertex]
-            #     for vertex in path_vertices
-            # ]
-            # nodes_wkt = pd.Series(path_ids).drop_duplicates().tolist()
-
-            # self._output_path.extend(nodes_wkt)
-            # for f in shortest_path_gdf["geometry"]:
-            #     print(f.wkt)
-            #     self._output_path.append(f)
         for path_id in path_ids:
             print(path_id)
             self._output_path.append(shortest_path_gdf[shortest_path_gdf['topo_uuid'] == path_id]["geometry"].iloc[0])
@@ -217,21 +197,22 @@ def app():
         }
 
         try:
-            data = computePath(
+            geojson_points_data, geojson_line_data = computePath(
                 mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"]
             ).run()
 
             output = jsonify(
                 {
-                    "path": data
+                    "points_path": geojson_points_data,
+                    "line_path": geojson_line_data
                 }
             )
 
         except ReduceYouPathArea as _:
             output = jsonify(
                 {
-                    "path": "Reduce your path. Overpass api could be angry ;)"
+                    "points_path": "Reduce your path. Overpass api could be angry ;)"
                 }
             )
         # except (ValueError) as err:
