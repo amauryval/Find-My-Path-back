@@ -11,9 +11,7 @@ function ViewSetterHandler() {
                         '<div class="col-sm-4">' +
                             '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
                         '</div>' +
-
                     '</div>' +
-
                 '</div>' +
             '</div>' +
         '</div>'
@@ -29,21 +27,42 @@ function PathSetterHandler() {
                 '<div class="setter-title col-sm-12">Définisser votre chemin</div>' +
                 '<div class="setter-elements col-sm-12">' +
                     '<div class="row">' +
-                        '<div class="col-sm-6">' +
-                            '<label class="btn btn-secondary active">' +
-                                '<input id="node_activation" type="checkbox" unchecked autocomplete="off">Edition' +
-                            '</label>' +
+
+                         '<div class="col-sm-12">' +
+                             '<div class="setter-sub-title col-sm-12">Choisissez le mode</div>' +
+                             '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
+                                '<label class="btn btn-secondary active">' +
+                                    '<input type="radio" name="mode_options" value="pedestrian" id="mode_pedestrian" autocomplete="off" checked>pedestrian' +
+                                '</label>' +
+                                '<label class="btn btn-secondary">' +
+                                    '<input type="radio" name="mode_options" id="mode_vehicle" value="vehicle" autocomplete="off">vehicle' +
+                                '</label>' +
+                            '</div>' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Download nodes</button>' +
+
+                        '<div class="col-sm-12">' +
+                            '<div class="setter-sub-title col-sm-12">Créer un chemin</div>' +
+                            '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
+                                '<label class="btn btn-secondary active">' +
+                                    '<input id="edition_mode" type="checkbox" unchecked autocomplete="off">Edition' +
+                                '</label>' +
+                            '</div>' +
                         '</div>' +
-                        '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
-                            '<ol id="path_coords_list" class="col-sm-12">' +
-                            '</ol>' +
+
+                        '<div class="col-sm-12">' +
+                            '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
+                                '<ol id="path_coords_list" class="col-sm-12">' +
+                                '</ol>' +
+                            '</div>' +
+                            '<div class="col-sm-6">' +
+                                '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
+                            '</div>' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
+
+                        '<div class="col-sm-12">' +
+                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Export nodes</button>' +
                         '</div>' +
+
                     '</div>' +
                 '</div>' +
             '</div>' +
@@ -79,7 +98,7 @@ $("#path_coords_list").on('click', '.down a', function(){
 });
 
 function GetCoordinatesOnClick(e) {
-    var node_activation_status = $("#node_activation")
+    var node_activation_status = $("#edition_mode")
     if ( node_activation_status.is(':checked') ) {
 
         var coord_data = $('<div class="col-sm-9 input-group coordinate_content">' +
@@ -202,6 +221,18 @@ function animationNode(node) {
 $("#path_setter_validation").on("click", function() {
     // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
     var url_build = `https://test-animated-path.herokuapp.com/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
+
+    var mode_vehicle = $('#mode_vehicle')
+    var mode_pedestrian = $('#mode_pedestrian')
+    if ( mode_vehicle.is(':checked') ) {
+        var mode = mode_vehicle.attr("value")
+    } else if ( mode_pedestrian.is(':checked') ) {
+        var mode = mode_pedestrian.attr("value")
+    } else {
+        alert("Choose a mode please")
+        return
+    }
+
 
     $.ajax({
         url: url_build,

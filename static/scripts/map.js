@@ -1,6 +1,6 @@
 
 var max_zoom = 17
-var min_zoom = 12
+var min_zoom = 9
 
 var background_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: max_zoom,
