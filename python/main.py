@@ -118,8 +118,8 @@ class computePath:
                 {
                     "type": "Feature",
                     "properties": {
-                        "from_id": self._input_nodes_data.iloc[0]["id"],
-                        "to_id": self._input_nodes_data.iloc[-1]["id"],
+                        "from_id": int(self._input_nodes_data.iloc[0]["id"]),
+                        "to_id": int(self._input_nodes_data.iloc[-1]["id"]),
                         "length": linestring_path.length
                     },
                     "geometry": mapping(linestring_path)
@@ -201,6 +201,8 @@ def app():
                 mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"]
             ).run()
+            print(geojson_points_data)
+            print(geojson_line_data)
 
             output = jsonify(
                 {
