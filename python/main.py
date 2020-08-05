@@ -75,26 +75,44 @@ class computePath:
     def run(self):
         self.prepare_data()
         self.compute_path()
-        points_data = self.format_data()
-        geojson_points_data = self.to_geojson_points(points_data)
-        geojson_line_data = self.to_geojson_linestring(points_data)
+        data_formated = self.format_data()
+        geojson_points_data = self.to_geojson_points(data_formated)
+        geojson_line_data = self.to_geojson_linestring(data_formated)
 
         return geojson_points_data, geojson_line_data
 
     def format_data(self):
+        paths_merged = []
+
         if self._mode == "pedestrian":
-            paths_merged = multilinestring_continuity(self._output_path)
+            last_coordinates = None
+            for enum, path in enumerate(self._output_paths):
+                if last_coordinates is not None:
+                    if last_coordinates != path["path_geom"][0].coords[0]:
+                        # we have to revert the coord order of the 1+ elements
+                        path["path_geom"] = [LineString(path["path_geom"][0].coords[::-1])] + path["path_geom"][1:]
 
-        points_path = []
-        for path_found in paths_merged:
-            coordinates = path_found.coords
-            for coord in coordinates:
-                # if coord not in path:
-                points_path.append(coord)
+                path["path_geom"] = multilinestring_continuity(path["path_geom"])
+                path["coords_flatten_path"] = [
+                    coords
+                    for line in path["path_geom"]
+                    for coords in line.coords
+                ]
+                last_coordinates = path["coords_flatten_path"][-1]
+                paths_merged.append(path)
 
-        return points_path
+        else:
+            for path in self._output_paths:
+                path["coords_flatten_path"] = [
+                    coords
+                    for line in path["path_geom"]
+                    for coords in line.coords
+                ]
+                paths_merged.append(path)
 
-    def to_geojson_points(self, points_path):
+        return paths_merged
+
+    def to_geojson_points(self, data):
 
         return {
             "type": "FeatureCollection",
@@ -105,26 +123,28 @@ class computePath:
                     "geometry": mapping(Point(coords))
 
                 }
-                for coords in points_path
+                for path in data
+                for coords in path["coords_flatten_path"]
             ]
         }
 
-    def to_geojson_linestring(self, points_path):
+    def to_geojson_linestring(self, data):
 
-        linestring_path = LineString(points_path)
         return {
             "type": "FeatureCollection",
             "features": [
                 {
                     "type": "Feature",
                     "properties": {
-                        "from_id": int(self._input_nodes_data.iloc[0]["id"]),
-                        "to_id": int(self._input_nodes_data.iloc[-1]["id"]),
-                        "length": linestring_path.length
+                        "from_id": feature["from_id"],
+                        "to_id": feature["to_id"],
+                        "length": LineString(feature["coords_flatten_path"]).length
                     },
-                    "geometry": mapping(linestring_path)
+                    "geometry": mapping(LineString(feature["coords_flatten_path"]))
 
                 }
+                for feature in data
+
             ]
         }
 
@@ -142,15 +162,14 @@ class computePath:
         self._start_node = self._input_nodes_data.loc[self._input_nodes_data["position"] == 1]["geometry"].iloc[0]
         nodes_path = [
             {
-                "position": int(row["position"]), "geometry": row["geometry"].wkt
+                "position": int(row["position"]), "id": int(row["id"]), "geometry": row["geometry"].wkt
             }
             for _, row in self._input_nodes_data.iterrows()
         ]
         nodes_path_ordered = sorted(nodes_path, key=itemgetter('position'), reverse=False)
         paths_to_compute = list(zip(nodes_path_ordered, nodes_path_ordered[1:]))
 
-        self._output_path = []
-        path_ids = []
+        self._output_paths = []
         for enum, (start_node, end_node) in enumerate(paths_to_compute):
             source_vertex = graph.find_vertex_from_name(start_node["geometry"])
             target_vertex = graph.find_vertex_from_name(end_node["geometry"])
@@ -163,15 +182,23 @@ class computePath:
             )
             print(enum, path_edges)
 
-            shortest_path_gdf = network_gdf.copy(deep=True)
+            network_gdf_copy = network_gdf.copy(deep=True)
             # # get path by using edge names
-            for edge in path_edges:
-                path_ids.append(graph.edge_names[edge])
-
-        for path_id in path_ids:
-            print(path_id)
-            self._output_path.append(shortest_path_gdf[shortest_path_gdf['topo_uuid'] == path_id]["geometry"].iloc[0])
-
+            path_ids = [
+                graph.edge_names[edge]
+                for edge in path_edges
+            ]
+            self._output_paths.append(
+                {
+                    "from_id": int(start_node["id"]),
+                    "to_id": int(end_node["id"]),
+                    "path_geom": [
+                        network_gdf_copy[network_gdf_copy['topo_uuid'] == path_id]["geometry"].iloc[0]
+                        for path_id in path_ids
+                    ],
+                    "path_ids": path_ids
+                }
+            )
 
 def app():
 
