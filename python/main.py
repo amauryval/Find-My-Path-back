@@ -21,6 +21,8 @@ from operator import itemgetter
 from shapely.ops import cascaded_union
 from graph_tool.topology import shortest_path
 
+from core.geometry import reproject
+
 
 def multilinestring_continuity(multilinestring):
 
@@ -44,6 +46,9 @@ class ReduceYouPathArea(Exception):
 
 
 class computePath:
+
+    __DEFAULT_EPSG = 4326
+    __METRIC_EPSG = 3857
 
     def __init__(self, geojson, mode):
 
@@ -140,8 +145,13 @@ class computePath:
                         "to_id": feature["to_id"],
                         "length": LineString(feature["coords_flatten_path"]).length
                     },
-                    "geometry": mapping(LineString(feature["coords_flatten_path"]))
-
+                    "geometry": mapping(
+                        reproject(LineString(
+                            feature["coords_flatten_path"]),
+                            self.__DEFAULT_EPSG,
+                            self.__METRIC_EPSG
+                        )
+                    )
                 }
                 for feature in data
 
