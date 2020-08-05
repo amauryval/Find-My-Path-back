@@ -9,7 +9,7 @@ function ViewSetterHandler() {
                 '<div class="setter-elements col-sm-11 legend">' +
                     '<div class="row">' +
                         '<div class="col-sm-8">' +
-                            '<input class="input-xlarge" id="focusedInput" type="text" value="Saisir votre territoire...">' +
+                            '<input class="input-xlarge" id="location_value" type="text" value="">' +
                         '</div>' +
                         '<div class="col-sm-4">' +
                             '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
@@ -268,7 +268,7 @@ $("#path_setter_validation").on("click", function() {
     }
 
     // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://test-animated-path.herokuapp.com/api/v1/data?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
@@ -289,6 +289,32 @@ $("#path_setter_validation").on("click", function() {
                 map.fitBounds(L.geoJson(PointPathData).getBounds());
 
                 animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
+            }
+
+        },
+    })
+})
+
+
+$("#view_setter_validation").on("click", function() {
+    // mode selection
+    var location = $('#location_value').val()
+
+    // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/location?name=${location}`;
+
+    $.ajax({
+        url: url_build,
+        async: true,
+        success: function (result) {
+            if ( result["bbox"] === 'Not found') {
+                alert("Location not found")
+            } else {
+
+                map.fitBounds([
+                    [result["bbox"][0], result["bbox"][2]],
+                    [result["bbox"][1], result["bbox"][3]]
+                ]);
             }
 
         },
