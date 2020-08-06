@@ -1,11 +1,12 @@
 
-.chart {
+#topo_chart {
     margin: unset;
     width: fit-content;
 }
 
 .legend-object {
     padding-bottom: 20px;
+    width: auto;
 }
 
 .legend-title {
@@ -56,7 +57,7 @@
 
 .setter-elements {
     font-weight: bold;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     margin: auto;
 }
 

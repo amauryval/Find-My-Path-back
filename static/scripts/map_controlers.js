@@ -106,13 +106,13 @@ function DownloadSetterHandler() {
 
 function topoChartHandler() {
     var chart = $(
-        '<div id="download_setter" class="container leaflet-control legend-object">' +
+        '<div id="chart_setter" class="container leaflet-control legend-object">' +
             '<div id="view-setter-container-title-container" class="row legend-title">' +
                 '<div class="setter-title col-sm-12">Courbe topographique</div>' +
             '</div>' +
             '<div id="view-setter-container" class="row">' +
                 '<div class="setter-elements col-sm-1"></div>' +
-                '<div class="setter-elements chart col-sm-11 legend">' +
+                '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
                     '<div class="row">' +
                         '<div class="col-sm-6">' +
                             '<div id="svgTopoChart"></div>' +

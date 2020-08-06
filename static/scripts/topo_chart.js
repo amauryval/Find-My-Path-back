@@ -8,9 +8,6 @@ function createTopoChart() {
         width = 600 - margin.left - margin.right,
         height = 270 - margin.top - margin.bottom;
 
-    // Parse the date / time
-    // var	parseDate = d3.time.format("%d-%b-%y").parse;
-
     // Set the ranges
     var	x = d3.scaleLinear().range([0, width]);
     var	y = d3.scaleLinear().range([height, 0]);
@@ -21,7 +18,7 @@ function createTopoChart() {
     var	yAxis = d3.axisLeft(y);
 
     // Define the line
-    var	valueline = d3.line()
+    var	line_value = d3.line()
         .x(function(d) { return x(d.properties.distance); })
         .y(function(d) { return y(d.properties.elevation); });
 
@@ -38,19 +35,18 @@ function createTopoChart() {
     x.domain(d3.extent(data, function(d) { return d.properties.distance; }));
     y.domain([d3.min(data, function(d) { return d.properties.elevation; }), d3.max(data, function(d) { return d.properties.elevation; })]);
 
-    // Add the valueline path.
-    svg.append("path")		// Add the valueline path.
+    // Add the line_value path.
+    svg.append("path")
         .attr("class", "line")
-        .attr("d", valueline(data))
+        .attr("d", line_value(data))
         .style("fill", "none") // add a color
         .style("opacity", "unset") // add 0 to hide the path
         .style("stroke", "black")
         .style("stroke-width", "2")
         .style("overflow", "overlay")
 
-        // Add the valueline path.
-    svg		// Add the valueline path.
-        .selectAll("circle")
+     // Add the valueline path.
+     svg.selectAll("circle")
         .data(data)
         .enter()
         .append("circle")
@@ -63,8 +59,8 @@ function createTopoChart() {
       })
       .on("mouseover", function(d,i) {
 
-        label.style("transform", "translate("+ x(d.properties.distance) +"px," + (y(d.properties.elevation)) +"px)")
-        label.text(d.close)
+        label.attr("transform", "translate("+ x(d.properties.distance) +"px," + (y(d.properties.elevation)) +"px)")
+        label.text(d.properties.elevation)
 
     })
     // Add the X Axis
@@ -77,6 +73,5 @@ function createTopoChart() {
     svg.append("g")			// Add the Y Axis
         .attr("class", "y axis")
         .call(yAxis);
-
 };
 
