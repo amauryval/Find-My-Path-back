@@ -137,12 +137,14 @@ class ComputePath:
 
     def to_geojson_points(self, data):
         features = []
+        distance_found = 0
         for path in data:
+
             for enum, coords in enumerate(path["coords_flatten_path"]):
-                if enum == 0:
-                    distance = 0
+                if len(path["coords_flatten_path"][:enum + 1]) > 1:
+                    distance_point = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
                 else:
-                    distance = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
+                    distance_point = 0
 
                 if self._elevation_mode == "enabled":
                     elevation = coords[-1]
@@ -154,11 +156,12 @@ class ComputePath:
                         "type": "Feature",
                         "properties": {
                             "elevation": elevation,
-                            "distance": distance
+                            "distance": distance_found + distance_point
                         },
                         "geometry": mapping(Point(coords))
                     }
                 )
+            distance_found += distance_point
 
         return {
             "type": "FeatureCollection",

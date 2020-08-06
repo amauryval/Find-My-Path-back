@@ -330,7 +330,7 @@ $("#path_setter_validation").on("click", function() {
                 map.fitBounds(L.geoJson(PointPathData).getBounds());
 
                 animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
-                $("#svgTopoChart")
+                $("#svgTopoChart svg").remove()
                 createTopoChart()
             }
 
