@@ -54,14 +54,14 @@ function PathSetterHandler() {
                                     '</label>' +
                                 '</div>' +
                             '</div>' +
-                            '<div class="setter-elements col-sm-12">' +
-                                '<div class="setter-sub-title col-sm-12">Activer le mode élevation</div>' +
-                                '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
-                                    '<label class="btn btn-secondary active">' +
-                                        '<input id="elevation_mode" type="checkbox" unchecked autocomplete="off">Elevation' +
-                                    '</label>' +
-                                '</div>' +
-                            '</div>' +
+                            // '<div class="setter-elements col-sm-12">' +
+                            //     '<div class="setter-sub-title col-sm-12">Activer le mode élevation</div>' +
+                            //     '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
+                            //         '<label class="btn btn-secondary active">' +
+                            //             '<input id="elevation_mode" type="checkbox" unchecked autocomplete="off">Elevation' +
+                            //         '</label>' +
+                            //     '</div>' +
+                            // '</div>' +
                         '</div>' +
 
                         '<div class="setter-elements col-sm-4">' +
@@ -276,16 +276,8 @@ $("#path_setter_validation").on("click", function() {
         return
     }
 
-    var elevation_status = $("#elevation_mode")
-
-    if ( elevation_status.is(':checked') ) {
-        var elevation_mode = "enabled"
-    } else {
-        var elevation_mode = "disabled"
-    }
-
     // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,

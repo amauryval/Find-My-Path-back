@@ -20,7 +20,7 @@ class ReduceYouPathArea(Exception):
 def get_elevation(coordinates):
     import requests
     parameters = {
-        "locations": f"{coordinates[-1]},{coordinates[0]}"
+        "locations": coordinates
     }
     response_code = 0
     while response_code != 200:
@@ -29,9 +29,13 @@ def get_elevation(coordinates):
         response_code = response.status_code
 
     print(response.url)
-    result = response.json()["results"][0]["elevation"]
-    print(result)
-    return result
+    results = response.json()["results"]
+    print(results)
+    return {
+        tuple([result["location"]["lng"] , result["location"]["lat"]]): tuple([result["location"]["lng"] , result["location"]["lat"], result["elevation"]])
+        for result in results
+    }
+
 
 
 class ComputePath:
@@ -39,12 +43,10 @@ class ComputePath:
     __DEFAULT_EPSG = 4326
     __METRIC_EPSG = 3857
 
-    def __init__(self, geojson, mode, elevation_mode):
+    def __init__(self, geojson, mode):
 
         self._geojson = json.loads(geojson)
         self._mode = mode
-        self._elevation_mode = elevation_mode
-        print("lalalllaaaaa", self._elevation_mode)
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
@@ -89,36 +91,37 @@ class ComputePath:
                         path["path_geom"] = [LineString(path["path_geom"][0].coords[::-1])] + path["path_geom"][1:]
 
                 path["path_geom"] = multilinestring_continuity(path["path_geom"])
-                if self._elevation_mode == "enabled":
-                    path["coords_flatten_path"] = [
-                        tuple(list(coords) + [get_elevation(coords)])
-                        for line in path["path_geom"]
-                        for coords in line.coords
-                    ]
-                else:
-                    path["coords_flatten_path"] = [
-                        coords
-                        for line in path["path_geom"]
-                        for coords in line.coords
-                    ]
-                last_coordinates = path["coords_flatten_path"][-1]
+
+                path["coords_flatten_path"] = [
+                    coords
+                    for line in path["path_geom"]
+                    for coords in line.coords
+                ]
+                coordinates = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in path["coords_flatten_path"]])
+                elevation_found = get_elevation(coordinates)
+                path["coords_flatten_path"] = [
+                    elevation_found[coord]
+                    for coord in path["coords_flatten_path"]
+                ]
+
+                last_coordinates = path["coords_flatten_path"][-1][:-1]  # to avoid the Z value
                 paths_merged.append(path)
 
         else:
             for path in self._output_paths:
 
-                if self._elevation_mode == "enabled":
-                    path["coords_flatten_path"] = [
-                        tuple(list(coords) + [get_elevation(coords)])
-                        for line in path["path_geom"]
-                        for coords in line.coords
-                    ]
-                else:
-                    path["coords_flatten_path"] = [
-                        coords
-                        for line in path["path_geom"]
-                        for coords in line.coords
-                    ]
+                path["coords_flatten_path"] = [
+                    coords
+                    for line in path["path_geom"]
+                    for coords in line.coords
+                ]
+                coordinates = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in path["coords_flatten_path"]])
+                elevation_found = get_elevation(coordinates)
+                path["coords_flatten_path"] = [
+                    elevation_found[coord]
+                    for coord in path["coords_flatten_path"]
+                ]
+
                 paths_merged.append(path)
 
         return paths_merged
@@ -130,19 +133,13 @@ class ComputePath:
                 if enum == 0:
                     distance = 0
                 else:
-                    print("b", path["coords_flatten_path"][:enum + 1])
                     distance = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
-
-                if self._elevation_mode == "enabled":
-                    elevation = coords[-1]
-                else:
-                    elevation = "None"
 
                 features.append(
                     {
                         "type": "Feature",
                         "properties": {
-                            "elevation": elevation,
+                            "elevation": coords[-1],
                             "distance": distance
                         },
                         "geometry": mapping(Point(coords))
