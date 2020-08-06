@@ -81,6 +81,7 @@ class ComputePath:
 
     def format_data(self):
         paths_merged = []
+        point_elevation_to_proceed = []
 
         if self._mode == "pedestrian":
             last_coordinates = None
@@ -97,14 +98,9 @@ class ComputePath:
                     for line in path["path_geom"]
                     for coords in line.coords
                 ]
-                coordinates = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in path["coords_flatten_path"]])
-                elevation_found = get_elevation(coordinates)
-                path["coords_flatten_path"] = [
-                    elevation_found[coord]
-                    for coord in path["coords_flatten_path"]
-                ]
+                point_elevation_to_proceed.extend(path["coords_flatten_path"])
 
-                last_coordinates = path["coords_flatten_path"][-1][:-1]  # to avoid the Z value
+                last_coordinates = path["coords_flatten_path"][-1] #[:-1]  # to avoid the Z value
                 paths_merged.append(path)
 
         else:
@@ -115,14 +111,16 @@ class ComputePath:
                     for line in path["path_geom"]
                     for coords in line.coords
                 ]
-                coordinates = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in path["coords_flatten_path"]])
-                elevation_found = get_elevation(coordinates)
-                path["coords_flatten_path"] = [
-                    elevation_found[coord]
-                    for coord in path["coords_flatten_path"]
-                ]
-
+                point_elevation_to_proceed.extend(path["coords_flatten_path"])
                 paths_merged.append(path)
+
+        point_elevation_to_proceed = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in set(point_elevation_to_proceed)])
+        elevation_found = get_elevation(point_elevation_to_proceed)
+        for path in paths_merged:
+            path["coords_flatten_path"] = [
+                elevation_found[coord]
+                for coord in path["coords_flatten_path"]
+            ]
 
         return paths_merged
 
