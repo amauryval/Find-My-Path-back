@@ -1,8 +1,13 @@
 
-import pyproj
+from pyproj import Proj
+from pyproj import Transformer
+import shapely.ops as sp_ops
+
 from shapely.ops import transform
 from functools import partial
 from shapely.geometry import LineString
+
+from pyproj import Geod
 
 
 def multilinestring_continuity(linestrings):
@@ -32,13 +37,40 @@ def reproject(geometry, from_epsg, to_epsg):
     """
 
     if from_epsg != to_epsg:
-        geometry = transform(
-            partial(
-                pyproj.transform,
-                pyproj.CRS(from_epsg),
-                pyproj.CRS(to_epsg),
-            ),
-            geometry,
-        )
+        proj_transformer = Transformer.from_crs(f'EPSG:{from_epsg}', f'EPSG:{to_epsg}', always_xy=True)
+        geometry = sp_ops.transform(proj_transformer.transform, geometry)
 
     return geometry
+
+
+def compute_wg84_line_length(input_geom):
+    """
+    Compute the length of a wg84 line (LineString and MultiLineString)
+
+    :param input_geom: input geometry
+    :type input_geom: shapely.geometry.LineString or shapely.geometry.MultiLineString
+    :return: the line length
+    :rtype: float
+
+    """
+    total_length = 0
+
+    if input_geom.geom_type == "MultiLineString":
+        for geom_line in input_geom.geoms:
+            total_length += compute_wg84_line_length(geom_line)
+
+    elif input_geom.geom_type == "LineString":
+        coordinates_pairs = list(zip(input_geom.coords, input_geom.coords[1:]))
+        print("trololo", coordinates_pairs)
+        for pair in coordinates_pairs:
+
+            if len(pair[0]) == 3 or len(pair[1]) == 3:
+                coords = pair[0][:-1] + pair[1][:-1]  # avoid to catch the elevation coord
+            else:
+                coords = pair[0] + pair[1]
+
+            wgs84_geod = Geod(ellps='WGS84')
+            _, _, length_computed = wgs84_geod.inv(*coords)
+            total_length += length_computed
+
+    return total_length

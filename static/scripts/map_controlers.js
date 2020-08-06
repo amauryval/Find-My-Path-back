@@ -54,6 +54,14 @@ function PathSetterHandler() {
                                     '</label>' +
                                 '</div>' +
                             '</div>' +
+                            '<div class="setter-elements col-sm-12">' +
+                                '<div class="setter-sub-title col-sm-12">Activer le mode élevation</div>' +
+                                '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
+                                    '<label class="btn btn-secondary active">' +
+                                        '<input id="elevation_mode" type="checkbox" unchecked autocomplete="off">Elevation' +
+                                    '</label>' +
+                                '</div>' +
+                            '</div>' +
                         '</div>' +
 
                         '<div class="setter-elements col-sm-4">' +
@@ -124,8 +132,8 @@ $("#path_coords_list").on('click', '.down a', function(){
 });
 
 function GetCoordinatesOnClick(e) {
-    var node_activation_status = $("#edition_mode")
-    if ( node_activation_status.is(':checked') ) {
+    var edition_mode_status = $("#edition_mode")
+    if ( edition_mode_status.is(':checked') ) {
 
         var coord_data = $('<div class="col-sm-9 input-group coordinate_content">' +
           // '<div class="input-group-prepend">' +
@@ -173,6 +181,7 @@ map.on('click', GetCoordinatesOnClick)
 
 var pathNodesData;
 var linePathData;
+var PointPathData;
 
 function MapPathNodes() {
     pathNodesData = null
@@ -267,8 +276,16 @@ $("#path_setter_validation").on("click", function() {
         return
     }
 
+    var elevation_status = $("#elevation_mode")
+
+    if ( elevation_status.is(':checked') ) {
+        var elevation_mode = "enabled"
+    } else {
+        var elevation_mode = "disabled"
+    }
+
     // var url_build = `http://localhost:5000/api/v1/data?geojson=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
@@ -282,7 +299,7 @@ $("#path_setter_validation").on("click", function() {
                 d3.selectAll("#SvgPathBuild").remove()
                 map._onResize()
                 linePathData = result["line_path"]
-                var PointPathData = result["points_path"]
+                PointPathData = result["points_path"]
 
                 // mapLine(result["path"]["data"], "SvgPathBuild")
 

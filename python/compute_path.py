@@ -10,10 +10,28 @@ from graph_tool.topology import shortest_path
 
 from core.geometry import reproject
 from core.geometry import multilinestring_continuity
+from core.geometry import compute_wg84_line_length
 
 
 class ReduceYouPathArea(Exception):
     pass
+
+
+def get_elevation(coordinates):
+    import requests
+    parameters = {
+        "locations": f"{coordinates[-1]},{coordinates[0]}"
+    }
+    response_code = 0
+    while response_code != 200:
+
+        response = requests.get("https://api.opentopodata.org/v1/mapzen?", params=parameters)
+        response_code = response.status_code
+
+    print(response.url)
+    result = response.json()["results"][0]["elevation"]
+    print(result)
+    return result
 
 
 class ComputePath:
@@ -21,10 +39,12 @@ class ComputePath:
     __DEFAULT_EPSG = 4326
     __METRIC_EPSG = 3857
 
-    def __init__(self, geojson, mode):
+    def __init__(self, geojson, mode, elevation_mode):
 
         self._geojson = json.loads(geojson)
         self._mode = mode
+        self._elevation_mode = elevation_mode
+        print("lalalllaaaaa", self._elevation_mode)
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
@@ -69,39 +89,69 @@ class ComputePath:
                         path["path_geom"] = [LineString(path["path_geom"][0].coords[::-1])] + path["path_geom"][1:]
 
                 path["path_geom"] = multilinestring_continuity(path["path_geom"])
-                path["coords_flatten_path"] = [
-                    coords
-                    for line in path["path_geom"]
-                    for coords in line.coords
-                ]
+                if self._elevation_mode == "enabled":
+                    path["coords_flatten_path"] = [
+                        tuple(list(coords) + [get_elevation(coords)])
+                        for line in path["path_geom"]
+                        for coords in line.coords
+                    ]
+                else:
+                    path["coords_flatten_path"] = [
+                        coords
+                        for line in path["path_geom"]
+                        for coords in line.coords
+                    ]
                 last_coordinates = path["coords_flatten_path"][-1]
                 paths_merged.append(path)
 
         else:
             for path in self._output_paths:
-                path["coords_flatten_path"] = [
-                    coords
-                    for line in path["path_geom"]
-                    for coords in line.coords
-                ]
+
+                if self._elevation_mode == "enabled":
+                    path["coords_flatten_path"] = [
+                        tuple(list(coords) + [get_elevation(coords)])
+                        for line in path["path_geom"]
+                        for coords in line.coords
+                    ]
+                else:
+                    path["coords_flatten_path"] = [
+                        coords
+                        for line in path["path_geom"]
+                        for coords in line.coords
+                    ]
                 paths_merged.append(path)
 
         return paths_merged
 
     def to_geojson_points(self, data):
+        features = []
+        for path in data:
+            for enum, coords in enumerate(path["coords_flatten_path"]):
+                if enum == 0:
+                    distance = 0
+                else:
+                    print("b", path["coords_flatten_path"][:enum + 1])
+                    distance = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
+
+                if self._elevation_mode == "enabled":
+                    elevation = coords[-1]
+                else:
+                    elevation = "None"
+
+                features.append(
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "elevation": elevation,
+                            "distance": distance
+                        },
+                        "geometry": mapping(Point(coords))
+                    }
+                )
 
         return {
             "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": mapping(Point(coords))
-
-                }
-                for path in data
-                for coords in path["coords_flatten_path"]
-            ]
+            "features": features
         }
 
     def to_geojson_linestring(self, data):
@@ -114,11 +164,7 @@ class ComputePath:
                     "properties": {
                         "from_id": feature["from_id"],
                         "to_id": feature["to_id"],
-                        "length": reproject(
-                            LineString(feature["coords_flatten_path"]),
-                            self.__DEFAULT_EPSG,
-                            self.__METRIC_EPSG
-                        ).length
+                        "length": compute_wg84_line_length(LineString(feature["coords_flatten_path"]))
                     },
                     "geometry": mapping(LineString(feature["coords_flatten_path"])),
                 }
