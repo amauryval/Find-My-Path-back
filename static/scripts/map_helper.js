@@ -268,7 +268,6 @@ function animatePointOnLine(geojson_nodes, id) {
                     map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
                     map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
             });
-
         // WARNING disabled after add svg with leaflet method...
         // size and location of the overall SVG container
         // svg.attr("width", bottomRight[0] - topLeft[0] + 120)
@@ -287,9 +286,11 @@ function animatePointOnLine(geojson_nodes, id) {
         linePath.transition()
             .duration(7500)
             .attrTween("stroke-dasharray", tweenDash)
-            // .on("end", function () {
-            //     d3.select(this).call(transition);// infinite loop
-            // });
+            .on("end", function () {
+                marker.style("opacity", "0")
+                textmarker.style("opacity", "0")
+                // d3.select(this).call(transition);// infinite loop
+            });
     }
 
     // this function feeds the attrTween operator above with the
