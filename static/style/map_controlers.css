@@ -1,4 +1,9 @@
 
+.chart {
+    margin: unset;
+    width: fit-content;
+}
+
 .legend-object {
     padding-bottom: 20px;
 }

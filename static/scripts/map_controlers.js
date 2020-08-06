@@ -104,9 +104,33 @@ function DownloadSetterHandler() {
     $(".leaflet-bottom.leaflet-left").append(controler)
 }
 
+function topoChartHandler() {
+    var chart = $(
+        '<div id="download_setter" class="container leaflet-control legend-object">' +
+            '<div id="view-setter-container-title-container" class="row legend-title">' +
+                '<div class="setter-title col-sm-12">Courbe topographique</div>' +
+            '</div>' +
+            '<div id="view-setter-container" class="row">' +
+                '<div class="setter-elements col-sm-1"></div>' +
+                '<div class="setter-elements chart col-sm-11 legend">' +
+                    '<div class="row">' +
+                        '<div class="col-sm-6">' +
+                            '<div id="svgTopoChart"></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>'
+    )
+    $(".leaflet-bottom.leaflet-left").append(chart)
+}
+
+
+
 ViewSetterHandler()
 PathSetterHandler()
 DownloadSetterHandler()
+topoChartHandler()
 
 // to disable click map on map divs
 $(".legend").each(function () {
@@ -306,6 +330,8 @@ $("#path_setter_validation").on("click", function() {
                 map.fitBounds(L.geoJson(PointPathData).getBounds());
 
                 animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
+                $("#svgTopoChart")
+                createTopoChart()
             }
 
         },
