@@ -5,7 +5,7 @@ function createTopoChart() {
     // Set the dimensions of the canvas / graph
     var	margin = {top: 30, right: 20, bottom: 30, left: 50},
         width = 600 - margin.left - margin.right,
-        height = 270 - margin.top - margin.bottom;
+        height = 300 - margin.top - margin.bottom;
 
     // Set the ranges
     var	x = d3.scaleLinear().range([0, width]);
@@ -93,15 +93,32 @@ function createTopoChart() {
                 .style("fill", "red")
         })
 
-    // Add the X Axis
-    svg.append("g")			// Add the X Axis
+    // Add X axis
+    svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
 
-    // Add the Y Axis
-    svg.append("g")			// Add the Y Axis
+    // text label x axis
+    svg.append("text")
+      .attr("transform",
+            "translate(" + (width/2) + " ," + (height + margin.top) + ")")
+      .style("text-anchor", "middle")
+      .text("Distance parcourue (mètre)");
+
+    // Add Y axis
+    svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
+
+    // text label y axis
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Altitude (mètres");
+
 };
 
