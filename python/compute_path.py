@@ -12,28 +12,38 @@ from core.geometry import reproject
 from core.geometry import multilinestring_continuity
 from core.geometry import compute_wg84_line_length
 
+import requests
+
 
 class ReduceYouPathArea(Exception):
     pass
 
 
+def chunks(features, chunk_size):
+    for idx in range(0, len(features), chunk_size):
+        yield features[idx:idx + chunk_size]
+
 def get_elevation(coordinates):
-    import requests
-    parameters = {
-        "locations": coordinates
-    }
-    response_code = 0
-    while response_code != 200:
+    chunk_size = 99  # api limit = 100
+    elevation_coords = []
 
-        response = requests.get("https://api.opentopodata.org/v1/mapzen?", params=parameters)
-        response_code = response.status_code
+    unique_coordinates = list(set(coordinates))
+    for coords_chunk in chunks(unique_coordinates, chunk_size):
+        coords_chunk = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in set(coords_chunk)])
+        parameters = {
+            "locations": coords_chunk
+        }
+        response_code = 0
+        while response_code != 200:
+            response = requests.get("https://api.opentopodata.org/v1/mapzen?", params=parameters)
+            response_code = response.status_code
 
-    print(response.url)
-    results = response.json()["results"]
-    print(results)
+        results = response.json()["results"]
+        elevation_coords.extend(results)
+
     return {
-        tuple([result["location"]["lng"] , result["location"]["lat"]]): tuple([result["location"]["lng"] , result["location"]["lat"], result["elevation"]])
-        for result in results
+        tuple([result["location"]["lng"], result["location"]["lat"]]): tuple([result["location"]["lng"], result["location"]["lat"], result["elevation"]])
+        for result in elevation_coords
     }
 
 
@@ -43,10 +53,11 @@ class ComputePath:
     __DEFAULT_EPSG = 4326
     __METRIC_EPSG = 3857
 
-    def __init__(self, geojson, mode):
+    def __init__(self, geojson, mode, elevation_mode):
 
         self._geojson = json.loads(geojson)
         self._mode = mode
+        self._elevation_mode = elevation_mode
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
@@ -100,7 +111,7 @@ class ComputePath:
                 ]
                 point_elevation_to_proceed.extend(path["coords_flatten_path"])
 
-                last_coordinates = path["coords_flatten_path"][-1] #[:-1]  # to avoid the Z value
+                last_coordinates = path["coords_flatten_path"][-1]
                 paths_merged.append(path)
 
         else:
@@ -114,13 +125,13 @@ class ComputePath:
                 point_elevation_to_proceed.extend(path["coords_flatten_path"])
                 paths_merged.append(path)
 
-        point_elevation_to_proceed = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in set(point_elevation_to_proceed)])
-        elevation_found = get_elevation(point_elevation_to_proceed)
-        for path in paths_merged:
-            path["coords_flatten_path"] = [
-                elevation_found[coord]
-                for coord in path["coords_flatten_path"]
-            ]
+        if self._elevation_mode == "enabled":
+            elevation_found = get_elevation(point_elevation_to_proceed)
+            for path in paths_merged:
+                path["coords_flatten_path"] = [
+                    elevation_found[coord]
+                    for coord in path["coords_flatten_path"]
+                ]
 
         return paths_merged
 
@@ -133,11 +144,16 @@ class ComputePath:
                 else:
                     distance = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
 
+                if self._elevation_mode == "enabled":
+                    elevation = coords[-1]
+                else:
+                    elevation = -9999
+
                 features.append(
                     {
                         "type": "Feature",
                         "properties": {
-                            "elevation": coords[-1],
+                            "elevation": elevation,
                             "distance": distance
                         },
                         "geometry": mapping(Point(coords))

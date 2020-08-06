@@ -65,6 +65,7 @@ def app():
     def get_path():
 
         url_arg_keys = {
+            "elevation_mode": request.args.get('elevation_mode', type=str),
             "mode": request.args.get('mode', type=str),
             "geojson": request.args.get('geojson', type=str),
         }
@@ -73,6 +74,7 @@ def app():
             geojson_points_data, geojson_line_data = ComputePath(
                 mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"],
+                elevation_mode=url_arg_keys["elevation_mode"],
             ).run()
             print(geojson_points_data)
             print(geojson_line_data)
