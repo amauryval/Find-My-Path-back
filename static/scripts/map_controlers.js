@@ -12,7 +12,7 @@ function ViewSetterHandler() {
                             '<input class="input-xlarge" id="location_value" type="text" value="">' +
                         '</div>' +
                         '<div class="col-sm-4">' +
-                            '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
+                            '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider*</button>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
@@ -66,6 +66,7 @@ function PathSetterHandler() {
 
                         '<div class="setter-elements col-sm-4">' +
                             '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
+                            '<p>si 1ere validation, attendez le démarrage de Heroku (quelques secondes...)</p>' +
                         '</div>' +
 
                         '<div class="setter-elements col-sm-12">' +
