@@ -61,7 +61,6 @@ def compute_wg84_line_length(input_geom):
 
     elif input_geom.geom_type == "LineString":
         coordinates_pairs = list(zip(input_geom.coords, input_geom.coords[1:]))
-        print("trololo", coordinates_pairs)
         for pair in coordinates_pairs:
 
             if len(pair[0]) == 3 or len(pair[1]) == 3:

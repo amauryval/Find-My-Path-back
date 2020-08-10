@@ -76,8 +76,6 @@ def app():
                 geojson=url_arg_keys["geojson"],
                 elevation_mode=url_arg_keys["elevation_mode"],
             ).run()
-            print(geojson_points_data)
-            print(geojson_line_data)
 
             output = jsonify(
                 {

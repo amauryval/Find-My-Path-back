@@ -46,7 +46,9 @@ def get_elevation(coordinates):
         for result in elevation_coords
     }
 
-
+def time_now():
+    import datetime
+    return datetime.datetime.now()
 
 class ComputePath:
 
@@ -61,7 +63,7 @@ class ComputePath:
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
-        self._input_nodes_data["bounds"] = self._input_nodes_data["geometry"].apply(lambda x: ", ".join((map(str, x.bounds))))
+        # self._input_nodes_data["bounds"] = self._input_nodes_data["geometry"].apply(lambda x: ", ".join((map(str, x.bounds))))
 
         bound_proceed = self._input_nodes_data.copy(deep=True)
         bound_proceed.set_crs(epsg=4326, inplace=True)
@@ -76,18 +78,12 @@ class ComputePath:
         bound_proceed.to_crs(epsg=4326, inplace=True)
         self._min_x, self._min_y, self._max_x, self._max_y = bound_proceed.geometry.total_bounds
 
-        print(self._min_x)
-        print(self._min_y)
-        print(self._max_x)
-        print(self._max_y)
-
     def run(self):
         self.prepare_data()
         self.compute_path()
         data_formated = self.format_data()
         geojson_points_data = self.to_geojson_points(data_formated)
         geojson_line_data = self.to_geojson_linestring(data_formated)
-
         return geojson_points_data, geojson_line_data
 
     def format_data(self):
@@ -188,16 +184,16 @@ class ComputePath:
         }
 
     def compute_path(self):
+        bbox_value = (self._min_x, self._min_y, self._max_x, self._max_y)
         network_from_web_found_topology_fixed = OsmGt.roads_from_bbox(
-            (self._min_y, self._min_x, self._max_y, self._max_x),
-            self._mode,
-            self._input_nodes_data
+            bbox_value,
+            additionnal_nodes=self._input_nodes_data,
+            mode=self._mode
         )
 
         graph = network_from_web_found_topology_fixed.get_graph()
         network_gdf = network_from_web_found_topology_fixed.get_gdf()
 
-        print("aaaa", self._input_nodes_data.shape, network_gdf.shape)
         self._start_node = self._input_nodes_data.loc[self._input_nodes_data["position"] == 1]["geometry"].iloc[0]
         nodes_path = [
             {
@@ -219,7 +215,6 @@ class ComputePath:
                 target=target_vertex,
                 weights=graph.edge_weights
             )
-            print(enum, path_edges)
 
             network_gdf_copy = network_gdf.copy(deep=True)
             # # get path by using edge names
