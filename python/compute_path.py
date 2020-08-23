@@ -8,9 +8,10 @@ from shapely.geometry import LineString
 from operator import itemgetter
 from graph_tool.topology import shortest_path
 
-from core.geometry import reproject
 from core.geometry import multilinestring_continuity
 from core.geometry import compute_wg84_line_length
+
+from shapely.ops import linemerge
 
 import requests
 
@@ -93,18 +94,18 @@ class ComputePath:
         if self._mode == "pedestrian":
             last_coordinates = None
             for enum, path in enumerate(self._output_paths):
-                if last_coordinates is not None:
-                    if last_coordinates != path["path_geom"][0].coords[0]:
-                        # we have to revert the coord order of the 1+ elements
-                        path["path_geom"] = [LineString(path["path_geom"][0].coords[::-1])] + path["path_geom"][1:]
 
-                path["path_geom"] = multilinestring_continuity(path["path_geom"])
+                # reorder linestring
+                path["path_geom"] = linemerge(path["path_geom"])
+                if not Point(path["path_geom"].coords[0]).wkt == path["from_id_wkt"]:
+                    # we have to revert the coord order of the 1+ elements
+                    path["path_geom"] = LineString(path["path_geom"].coords[::-1])
 
                 path["coords_flatten_path"] = [
                     coords
-                    for line in path["path_geom"]
-                    for coords in line.coords
+                    for coords in path["path_geom"].coords
                 ]
+
                 point_elevation_to_proceed.extend(path["coords_flatten_path"])
 
                 last_coordinates = path["coords_flatten_path"][-1]
@@ -226,6 +227,8 @@ class ComputePath:
                 {
                     "from_id": int(start_node["id"]),
                     "to_id": int(end_node["id"]),
+                    "from_id_wkt": start_node["geometry"],
+                    "to_id_wkt": end_node["geometry"],
                     "path_geom": [
                         network_gdf_copy[network_gdf_copy['topo_uuid'] == path_id]["geometry"].iloc[0]
                         for path_id in path_ids
