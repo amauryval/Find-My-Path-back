@@ -1,0 +1,78 @@
+#map {
+    position:fixed;
+    width:100%;
+    height:100%;
+    z-index:0;
+}
+
+svg circle.PathNodes {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    fill: orange;
+    opacity: 0.8;
+    stroke: black;
+    stroke-width: 1px;
+    stroke-opacity: 1;
+    font-size: 45px;
+    cursor: pointer;
+}
+
+svg circle.PathNodes:first-child {
+    fill: red;
+}
+
+svg circle.PathNodes:last-of-type {
+    fill: green;
+}
+
+svg text.PathNodesText {
+    fill: black;
+    stroke: antiquewhite;
+    stroke-width: 1px;
+    font-size: 30px;
+    font-family: Arial;
+    font-weight: bold;
+}
+
+
+
+
+/*snippet pulse*/
+/*.pulse {*/
+/*    animation-duration: 1s;*/
+/*    animation-iteration-count: infinite;*/
+/*    animation-name: pulseBeat;*/
+/*    transform-origin: center center;*/
+/*}*/
+/*@keyframes pulseBeat {*/
+/*  0%*/
+/*  {*/
+/*            r: 8;*/
+/*    transform: scale( .75 );*/
+/*  }*/
+/*  20%*/
+/*  {*/
+/*            r: 10;*/
+/*    transform: scale( 1 );*/
+/*  }*/
+/*  40%*/
+/*  {*/
+/*                  r: 8;*/
+/*    transform: scale( .75 );*/
+/*  }*/
+/*  60%*/
+/*  {*/
+/*            r: 10;*/
+/*    transform: scale( 1 );*/
+/*  }*/
+/*  80%*/
+/*  {*/
+/*                  r: 8;*/
+/*    transform: scale( .75 );*/
+/*  }*/
+/*  100%*/
+/*  {*/
+/*                  r: 8;*/
+/*    transform: scale( .75 );*/
+/*  }*/
+/*}*/
