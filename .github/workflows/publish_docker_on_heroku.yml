@@ -1,4 +1,4 @@
-name: Publishing Docker on Heroku
+name: Publish Docker on Heroku
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  Test_and_publish_on_conda:
+  Test_and_publish_Docker_on_heroku:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout

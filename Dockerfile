@@ -10,8 +10,8 @@ WORKDIR /home/app/
 
 # conda env creation
 RUN conda env create -f environment.yml
-RUN echo "source activate osmgt" > ~/.bashrc
-ENV PATH /opt/conda/envs/osmgt/bin:$PATH
+RUN echo "source activate fmp" > ~/.bashrc
+ENV PATH /opt/conda/envs/fmp/bin:$PATH
 #RUN echo "source activate $(head -1 $conda_dir_env | cut -d' ' -f2)" > ~/.bashrc
 #ENV PATH /opt/conda/envs/$(head -1 $conda_dir_env | cut -d' ' -f2)/bin:$PATH
 
