@@ -6,12 +6,8 @@ from shapely.geometry import mapping
 from shapely.geometry import Point
 from shapely.geometry import LineString
 from operator import itemgetter
-from graph_tool.topology import shortest_path
 
-from core.geometry import multilinestring_continuity
 from core.geometry import compute_wg84_line_length
-
-from shapely.ops import linemerge
 
 import requests
 
@@ -20,41 +16,17 @@ class ReduceYouPathArea(Exception):
     pass
 
 
-def chunks(features, chunk_size):
-    for idx in range(0, len(features), chunk_size):
-        yield features[idx:idx + chunk_size]
+class ErrorComputePath(Exception):
+    pass
 
-def get_elevation(coordinates):
-    chunk_size = 99  # api limit = 100
-    elevation_coords = []
-
-    unique_coordinates = list(set(coordinates))
-    for coords_chunk in chunks(unique_coordinates, chunk_size):
-        coords_chunk = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in set(coords_chunk)])
-        parameters = {
-            "locations": coords_chunk
-        }
-        response_code = 0
-        while response_code != 200:
-            response = requests.get("https://api.opentopodata.org/v1/mapzen?", params=parameters)
-            response_code = response.status_code
-
-        results = response.json()["results"]
-        elevation_coords.extend(results)
-
-    return {
-        tuple([result["location"]["lng"], result["location"]["lat"]]): tuple([result["location"]["lng"], result["location"]["lat"], result["elevation"]])
-        for result in elevation_coords
-    }
-
-def time_now():
-    import datetime
-    return datetime.datetime.now()
 
 class ComputePath:
 
     __DEFAULT_EPSG = 4326
     __METRIC_EPSG = 3857
+    __CHUNK_SIZE = 99  # api mapzen limit == 100
+
+    __API_MAPZEN_URL = "https://api.opentopodata.org/v1/mapzen?"
 
     def __init__(self, geojson, mode, elevation_mode):
 
@@ -64,7 +36,6 @@ class ComputePath:
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
-        # self._input_nodes_data["bounds"] = self._input_nodes_data["geometry"].apply(lambda x: ", ".join((map(str, x.bounds))))
 
         bound_proceed = self._input_nodes_data.copy(deep=True)
         bound_proceed.set_crs(epsg=4326, inplace=True)
@@ -77,74 +48,29 @@ class ComputePath:
             raise ReduceYouPathArea()
 
         bound_proceed.to_crs(epsg=4326, inplace=True)
-        self._min_x, self._min_y, self._max_x, self._max_y = bound_proceed.geometry.total_bounds
+        return bound_proceed.geometry.total_bounds
 
     def run(self):
-        self.prepare_data()
-        self.compute_path()
-        data_formated = self.format_data()
-        geojson_points_data = self.to_geojson_points(data_formated)
-        geojson_line_data = self.to_geojson_linestring(data_formated)
+        self._bbox_to_use = self.prepare_data()
+
+        output_path = self.compute_path()
+        geojson_points_data = self.to_geojson_points(output_path)
+        geojson_line_data = self.to_geojson_linestring(output_path)
         return geojson_points_data, geojson_line_data
-
-    def format_data(self):
-        paths_merged = []
-        point_elevation_to_proceed = []
-
-        if self._mode == "pedestrian":
-            last_coordinates = None
-            for enum, path in enumerate(self._output_paths):
-
-                # reorder linestring
-                path["path_geom"] = linemerge(path["path_geom"])
-                if not Point(path["path_geom"].coords[0]).wkt == path["from_id_wkt"]:
-                    # we have to revert the coord order of the 1+ elements
-                    path["path_geom"] = LineString(path["path_geom"].coords[::-1])
-
-                path["coords_flatten_path"] = [
-                    coords
-                    for coords in path["path_geom"].coords
-                ]
-
-                point_elevation_to_proceed.extend(path["coords_flatten_path"])
-
-                last_coordinates = path["coords_flatten_path"][-1]
-                paths_merged.append(path)
-
-        else:
-            for path in self._output_paths:
-
-                path["coords_flatten_path"] = [
-                    coords
-                    for line in path["path_geom"]
-                    for coords in line.coords
-                ]
-                point_elevation_to_proceed.extend(path["coords_flatten_path"])
-                paths_merged.append(path)
-
-        if self._elevation_mode == "enabled":
-            elevation_found = get_elevation(point_elevation_to_proceed)
-            for path in paths_merged:
-                path["coords_flatten_path"] = [
-                    elevation_found[coord]
-                    for coord in path["coords_flatten_path"]
-                ]
-
-        return paths_merged
 
     def to_geojson_points(self, data):
         features = []
         distance_found = 0
         for path in data:
-
-            for enum, coords in enumerate(path["coords_flatten_path"]):
-                if len(path["coords_flatten_path"][:enum + 1]) > 1:
-                    distance_point = compute_wg84_line_length(LineString(path["coords_flatten_path"][:enum + 1]))
+            for enum, node_coord in enumerate(path["geometry"]):
+                nodes_to_proceed = path["geometry"][:enum + 1]
+                if len(nodes_to_proceed) > 1:
+                    distance_point = compute_wg84_line_length(LineString(nodes_to_proceed))
                 else:
                     distance_point = 0
 
                 if self._elevation_mode == "enabled":
-                    elevation = coords[-1]
+                    elevation = node_coord[-1]
                 else:
                     elevation = -9999
 
@@ -155,17 +81,18 @@ class ComputePath:
                             "elevation": elevation,
                             "distance": distance_found + distance_point
                         },
-                        "geometry": mapping(Point(coords))
+                        "geometry": mapping(Point(node_coord))
                     }
                 )
-            distance_found += distance_point
+                distance_found += distance_point
 
         return {
             "type": "FeatureCollection",
             "features": features
         }
 
-    def to_geojson_linestring(self, data):
+    @staticmethod
+    def to_geojson_linestring(data):
 
         return {
             "type": "FeatureCollection",
@@ -173,66 +100,107 @@ class ComputePath:
                 {
                     "type": "Feature",
                     "properties": {
-                        "from_id": feature["from_id"],
-                        "to_id": feature["to_id"],
-                        "length": compute_wg84_line_length(LineString(feature["coords_flatten_path"]))
+                        "source_node": feature["source_node"],
+                        "target_node": feature["target_node"],
+                        "path_step": feature["path_step"],
+                        "length": compute_wg84_line_length(LineString(feature["geometry"]))
                     },
-                    "geometry": mapping(LineString(feature["coords_flatten_path"])),
+                    "geometry": mapping(LineString(feature["geometry"])),
                 }
                 for feature in data
-
             ]
         }
 
     def compute_path(self):
-        bbox_value = (self._min_x, self._min_y, self._max_x, self._max_y)
-        network_from_web_found_topology_fixed = OsmGt.roads_from_bbox(
-            bbox_value,
-            additionnal_nodes=self._input_nodes_data,
-            mode=self._mode
-        )
+        output_paths = []
 
-        graph = network_from_web_found_topology_fixed.get_graph()
-        network_gdf = network_from_web_found_topology_fixed.get_gdf()
-
-        self._start_node = self._input_nodes_data.loc[self._input_nodes_data["position"] == 1]["geometry"].iloc[0]
         nodes_path = [
             {
-                "position": int(row["position"]), "id": int(row["id"]), "geometry": row["geometry"].wkt
+                "position": int(row["position"]), "geometry": row["geometry"]
             }
             for _, row in self._input_nodes_data.iterrows()
         ]
         nodes_path_ordered = sorted(nodes_path, key=itemgetter('position'), reverse=False)
         paths_to_compute = list(zip(nodes_path_ordered, nodes_path_ordered[1:]))
 
-        self._output_paths = []
-        for enum, (start_node, end_node) in enumerate(paths_to_compute):
-            source_vertex = graph.find_vertex_from_name(start_node["geometry"])
-            target_vertex = graph.find_vertex_from_name(end_node["geometry"])
+        path_ordered = {
+            str(enum): (start_node["geometry"], end_node["geometry"])
+            for enum, (start_node, end_node) in enumerate(paths_to_compute)
+        }
 
-            path_vertices, path_edges = shortest_path(
-                graph,
-                source=source_vertex,
-                target=target_vertex,
-                weights=graph.edge_weights
-            )
+        output_gdf = OsmGt.shortest_path_from_bbox(
+            self._bbox_to_use,
+            path_ordered.values(),
+            self._mode,
+        )
 
-            network_gdf_copy = network_gdf.copy(deep=True)
-            # # get path by using edge names
-            path_ids = [
-                graph.edge_names[edge]
-                for edge in path_edges
-            ]
-            self._output_paths.append(
-                {
-                    "from_id": int(start_node["id"]),
-                    "to_id": int(end_node["id"]),
-                    "from_id_wkt": start_node["geometry"],
-                    "to_id_wkt": end_node["geometry"],
-                    "path_geom": [
-                        network_gdf_copy[network_gdf_copy['topo_uuid'] == path_id]["geometry"].iloc[0]
-                        for path_id in path_ids
-                    ],
-                    "path_ids": path_ids
-                }
-            )
+        for order, path_coord in path_ordered.items():
+            source_node_wkt = path_coord[0].wkt
+            target_node_wkt = path_coord[-1].wkt
+
+            geom_data = output_gdf.loc[
+                (output_gdf["source_node"] == source_node_wkt) & (output_gdf["target_node"] == target_node_wkt)
+            ].iloc[0]["geometry"].coords
+
+            if self._elevation_mode == "enabled":
+                geom_data = self.get_elevation(geom_data)
+
+            output_paths.append({
+                "source_node": source_node_wkt,
+                "target_node": target_node_wkt,
+                "path_step": order,
+                "geometry": geom_data
+            })
+
+        return output_paths
+
+    @staticmethod
+    def chunks(features, chunk_size):
+        for idx in range(0, len(features), chunk_size):
+            yield features[idx:idx + chunk_size]
+
+    def get_elevation(self, coordinates):
+        elevation_coords = []
+
+        unique_coordinates = list(set(coordinates))
+        for coords_chunk in self.chunks(unique_coordinates, self.__CHUNK_SIZE):
+
+            coords_chunk = "|".join([",".join([str(coord[-1]), str(coord[0])]) for coord in set(coords_chunk)])
+            parameters = {
+                "locations": coords_chunk
+            }
+
+            response_code = 0
+            response = None
+            while response_code != 200:
+                response = requests.get(self.__API_MAPZEN_URL, params=parameters)
+                response_code = response.status_code
+
+            if response is not None:
+                results = response.json()["results"]
+            else:
+                raise ErrorComputePath(f"None reponse from {self.__API_MAPZEN_URL}")
+
+            elevation_coords.extend(results)
+
+        coordinates_with_elevation = []
+        for orig_coord in coordinates:
+            new_coord = list(filter(
+                lambda x: orig_coord == tuple([x["location"]["lng"], x["location"]["lat"]]),
+                elevation_coords
+            ))
+            if len(new_coord) == 1:
+                new_coord = new_coord[0]
+                coordinates_with_elevation.append(
+                    tuple(
+                        [
+                            new_coord["location"]["lng"],
+                            new_coord["location"]["lat"],
+                            new_coord["elevation"]
+                        ]
+                    )
+                )
+            else:
+                raise ErrorComputePath(f"Elevation result not found for: {orig_coord}")
+
+        return coordinates_with_elevation
