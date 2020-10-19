@@ -1,6 +1,7 @@
 
 from pyproj import Geod
 
+
 def compute_wg84_line_length(input_geom):
     """
     Compute the length of a wg84 line (LineString and MultiLineString)

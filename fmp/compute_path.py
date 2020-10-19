@@ -7,7 +7,7 @@ from shapely.geometry import Point
 from shapely.geometry import LineString
 from operator import itemgetter
 
-from core.geometry import compute_wg84_line_length
+from fmp.core.geometry import compute_wg84_line_length
 
 import requests
 
@@ -28,7 +28,7 @@ class ComputePath:
 
     __API_MAPZEN_URL = "https://api.opentopodata.org/v1/mapzen?"
 
-    def __init__(self, geojson, mode, elevation_mode):
+    def __init__(self, geojson, mode, elevation_mode="disabled"):
 
         self._geojson = json.loads(geojson)
         self._mode = mode

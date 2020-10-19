@@ -7,11 +7,11 @@ from flask import request
 from flask import Blueprint
 from flask_cors import CORS
 
-from compute_path import ComputePath
-from compute_path import ReduceYouPathArea
+from fmp.compute_path import ComputePath
+from fmp.compute_path import ReduceYouPathArea
 
-from find_location import FindLocation
-from find_location import LocationNotFound
+from fmp.find_location import FindLocation
+from fmp.find_location import LocationNotFound
 
 
 def app():
