@@ -1,0 +1,79 @@
+name: Publishing Conda Package
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+
+  Test_and_publish_on_conda:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        if [[ "${{ runner.os }}" = "Linux" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-Linux-x86_64.sh
+        elif [[ "${{ runner.os }}" = "macOS" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+        elif [[ "${{ runner.os }}" = "Windows" ]]; then
+          MINICONDA_FILENAME=Miniconda3-latest-Windows-x86_64.exe
+        fi
+        curl -L -o $MINICONDA_FILENAME "https://repo.anaconda.com/miniconda/$MINICONDA_FILENAME"
+        bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
+        rm ${MINICONDA_FILENAME}
+
+    - name: Setup paths
+      shell: bash
+      run: |
+        echo "::add-path::$HOME/miniconda3/bin"
+        echo "::add-path::$HOME/miniconda3/Scripts"
+        if [ "${{ matrix.os }}" != "windows-latest" ]; then
+          echo '::set-env name=CONDA_EXEC::${CONDA}/bin/conda'
+        else
+          echo '::set-env name=CONDA_EXEC::C:\Miniconda\condabin\conda.bat'
+        fi
+
+    - name: Configure conda
+      env:
+        CONDA_REQS: "conda conda-verify"
+      run: |
+        conda config --set auto_update_conda off
+        conda install --yes --quiet $CONDA_REQS
+        conda install --yes --quiet mamba -c conda-forge
+        mamba env create --file environment.yml
+
+    - name: Run tests
+      shell: bash
+      run: |
+        source ~/miniconda3/etc/profile.d/conda.sh
+        conda activate fmp
+        python -m pytest --cov=fmp --cov-report=xml tests/
+
+    - name: Build the notebook index.html
+      run: |
+        source ~/miniconda3/etc/profile.d/conda.sh
+        conda activate fmp
+        mkdir _build
+        jupyter nbconvert --to html example.ipynb --ExecutePreprocessor.kernel_name=python --ExecutePreprocessor.enabled=True --output=_build/index.html
+
+    # Deploy the book's HTML to gh-pages branch
+    - name: GitHub Pages action
+      uses: peaceiris/actions-gh-pages@v3.6.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/
+
+    - name: Build, Push and Deploy to Heroku #set the whatever name you want to this step
+        id: heroku
+        uses: jctaveras/heroku-deploy@v1.0.0  # use the latest version of the action
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }}
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          app_name: ${{ secrets.HEROKU_APP_NAME }}
+          dockerfile_path: '.' # set the path to the folder wher the Dokerfile is located
+          options: '' # Docker Build Options

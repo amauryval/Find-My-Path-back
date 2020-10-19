@@ -1,4 +1,4 @@
-name: osmgt
+name: fmp
 channels:
   - conda-forge
   - amauryval
