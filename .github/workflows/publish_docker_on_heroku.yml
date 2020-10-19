@@ -2,10 +2,8 @@ name: Publish Docker on Heroku
 
 on:
   push:
-    branches:
-      - master
-#    tags:
-#      - '*.*.*'
+    tags:
+      - '*.*.*'
 
 jobs:
 
