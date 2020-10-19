@@ -309,8 +309,8 @@ $("#path_setter_validation").on("click", function() {
         var elevation_mode = "disabled"
     }
 
-    var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
-    // var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+    // var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
@@ -344,8 +344,8 @@ $("#view_setter_validation").on("click", function() {
     // mode selection
     var location = $('#location_value').val()
 
-    var url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
-    // var url_build = `https://test-animated-path.herokuapp.com/api/v1/location?name=${location}`;
+    // var url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
+    var url_build = `https://test-animated-path.herokuapp.com/api/v1/location?name=${location}`;
 
     $.ajax({
         url: url_build,
