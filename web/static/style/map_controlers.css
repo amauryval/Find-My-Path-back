@@ -1,6 +1,6 @@
 
 #topo_chart {
-    margin: unset;
+    /*margin: unset;*/
     width: fit-content;
 }
 
@@ -34,9 +34,9 @@
     border-radius: 25px;
     width: 400px;
     padding-top: 30px;
-    padding-bottom: 10px;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-bottom: 20px;
+    /* padding-left: 25px; */
+    /* padding-right: 25px; */
     box-shadow: 10px 5px 5px rgba(116, 116, 116, 0.78);
 }
 
@@ -57,7 +57,6 @@
 
 .setter-elements {
     font-weight: bold;
-    padding-bottom: 5px;
     margin: auto;
 }
 
@@ -67,7 +66,7 @@
 
 #path_coords_list {
     padding-left: 4em;
-    max-height: 300px;
+    max-height: 200px;
     overflow-x: hidden;
 }
 
@@ -89,3 +88,13 @@ textarea {
     padding-bottom: 10px;
 }
 
+#chart_setter {
+    margin: 30px;
+}
+
+.tooltip {
+    /*margin: 15px;*/
+    /*background-color: grey;*/
+    /*border-radius: 15px;*/
+    /*border: 1px solid black;*/
+}

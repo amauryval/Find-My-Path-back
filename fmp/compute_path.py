@@ -84,7 +84,7 @@ class ComputePath:
                         "geometry": mapping(Point(node_coord))
                     }
                 )
-                distance_found += distance_point
+            distance_found += distance_point
 
         return {
             "type": "FeatureCollection",
