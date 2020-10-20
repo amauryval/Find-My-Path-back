@@ -1,11 +1,34 @@
 
 function createTopoChart() {
 
+    function topoChartHandler() {
+        var chart = $(
+            '<div id="chart_setter" class="container leaflet-control legend-object">' +
+                '<div id="view-setter-container-title-container" class="row legend-title">' +
+                    '<div class="setter-title col-sm-12">Courbe topographique</div>' +
+                '</div>' +
+                '<div id="view-setter-container" class="row">' +
+                    '<div class="setter-elements col-sm-1"></div>' +
+                    '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
+                            '<div class="col-sm-12">' +
+                                '<div id="svgTopoChart"></div>' +
+                            '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        )
+
+        $("#chart_setter").remove()
+        $(".leaflet-top.leaflet-right").append(chart)
+
+    }
+
+    topoChartHandler()
 
     // Set the dimensions of the canvas / graph
     var	margin = {top: 30, right: 20, bottom: 30, left: 50},
         width = 600 - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+        height = 280 - margin.top - margin.bottom;
 
     // Set the ranges
     var	x = d3.scaleLinear().range([0, width]);
@@ -80,7 +103,6 @@ function createTopoChart() {
                 .attr("r", 8)
                 .style("opacity", "1")
                 .style("fill", "red")
-
             })
         .on("mouseout", function(d) {
             d3.select(this).attr("r", 3)
@@ -118,7 +140,7 @@ function createTopoChart() {
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
       .style("text-anchor", "middle")
-      .text("Altitude (mètres");
+      .text("Altitude (mètres)");
 
 };
 

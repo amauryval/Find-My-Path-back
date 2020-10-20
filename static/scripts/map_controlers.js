@@ -105,33 +105,11 @@ function DownloadSetterHandler() {
     $(".leaflet-bottom.leaflet-left").append(controler)
 }
 
-function topoChartHandler() {
-    var chart = $(
-        '<div id="chart_setter" class="container leaflet-control legend-object">' +
-            '<div id="view-setter-container-title-container" class="row legend-title">' +
-                '<div class="setter-title col-sm-12">Courbe topographique</div>' +
-            '</div>' +
-            '<div id="view-setter-container" class="row">' +
-                '<div class="setter-elements col-sm-1"></div>' +
-                '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
-                    '<div class="row">' +
-                        '<div class="col-sm-6">' +
-                            '<div id="svgTopoChart"></div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>'
-    )
-    $(".leaflet-top.leaflet-right").append(chart)
-}
-
-
 
 ViewSetterHandler()
 PathSetterHandler()
 DownloadSetterHandler()
-topoChartHandler()
+
 
 // to disable click map on map divs
 $(".legend").each(function () {
@@ -162,7 +140,7 @@ function GetCoordinatesOnClick(e) {
 
         var coord_data = $('<div class="col-sm-9 input-group coordinate_content">' +
           // '<div class="input-group-prepend">' +
-            '<span class="centered">Point N°' + ($("#path_coords_list li").length + 1) + '</span>' +
+            '<span class="centered">Etape N°' + ($("#path_coords_list li").length + 1) + '</span>' +
           // '</div>' +
           '<textarea class="centered" aria-label="With textarea"></textarea>' +
         '</div>')
@@ -332,7 +310,11 @@ $("#path_setter_validation").on("click", function() {
 
                 animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
                 $("#svgTopoChart svg").remove()
-                createTopoChart()
+
+                if ( elevation_mode === "enabled" ) {
+                    createTopoChart()
+                }
+
             }
 
         },
