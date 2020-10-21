@@ -1,4 +1,4 @@
-name: Publish Docker on Heroku
+name: Deploy Docker on Heroku
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  Test_and_publish_Docker_on_heroku:
+  Test_and_deploy_Docker_on_heroku:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -61,8 +61,10 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: web/
 
-    - name: publish-Dockerfile-on-Heroku
-      uses: amauryval/deploy_docker_on_heroku_action@master
-      with:
-        HerokuAppName: ${{ secrets.HEROKU_APP_NAME }}
-        HerokuApiKey:  ${{ secrets.HEROKU_API_KEY }}
+    - name: Login, Build, Push and Release to Heroku Container registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku container:login
+        heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
+        heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
