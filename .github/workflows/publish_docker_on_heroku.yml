@@ -62,7 +62,7 @@ jobs:
         publish_dir: web/
 
     - name: publish-Dockerfile-on-Heroku
-      uses: amauryval/deploy_docker_on_heroku@master
+      uses: amauryval/deploy_docker_on_heroku_action@master
       with:
         HerokuAppName: ${{ secrets.HEROKU_APP_NAME }}
         HerokuApiKey:  ${{ secrets.HEROKU_API_KEY }}
