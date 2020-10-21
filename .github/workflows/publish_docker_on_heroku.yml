@@ -61,17 +61,8 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: web/
 
-    - name: Login to Heroku Container registry
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:login
-
-    - name: Build and push
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
-
-    - name: Release
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+    - name: publish-Dockerfile-on-Heroku
+      uses: amauryval/deploy_docker_on_heroku@master
+      with:
+        HerokuAppName: ${{ secrets.HEROKU_APP_NAME }}
+        HerokuApiKey:  ${{ secrets.HEROKU_API_KEY }}
