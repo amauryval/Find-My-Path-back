@@ -1,10 +1,10 @@
 function ViewSetterHandler() {
     var controler = $(
-        '<div id="view_setter" class="container leaflet-control legend-object">' +
-            '<div id="view-setter-container-title-container" class="row legend-title">' +
+        '<div id="view_setter" class="legend-object">' +
+            '<div id="view-setter-container-title-container" class="legend-title">' +
                 '<div class="setter-title col-sm-12">Afficher un territoire</div>' +
             '</div>' +
-            '<div id="view-setter-container" class="row">' +
+            '<div id="view-setter-container" class="">' +
                 '<div class="setter-elements col-sm-1"></div>' +
                 '<div class="setter-elements col-sm-11 legend">' +
                     '<div class="row">' +
@@ -19,13 +19,13 @@ function ViewSetterHandler() {
             '</div>' +
         '</div>'
     )
-    $(".leaflet-bottom.leaflet-left").append(controler)
+    $("#controler-bar").append(controler)
 }
 
 
 function PathSetterHandler() {
     var controler = $(
-        '<div id="path_setter" class="container leaflet-control legend-object">' +
+        '<div id="path_setter" class="legend-object">' +
             '<div id="path-setter-container-title-container" class="row legend-title">' +
                 '<div class="setter-title col-sm-12">Définir un chemin</div>' +
             '</div>' +
@@ -78,12 +78,12 @@ function PathSetterHandler() {
             '</div>' +
         '</div>'
     )
-    $(".leaflet-bottom.leaflet-left").append(controler)
+    $("#controler-bar").append(controler)
 }
 
 function DownloadSetterHandler() {
     var controler = $(
-        '<div id="download_setter" class="container leaflet-control legend-object">' +
+        '<div id="download_setter" class="legend-object">' +
             '<div id="view-setter-container-title-container" class="row legend-title">' +
                 '<div class="setter-title col-sm-12">Exporter les résultats</div>' +
             '</div>' +
@@ -102,7 +102,7 @@ function DownloadSetterHandler() {
             '</div>' +
         '</div>'
     )
-    $(".leaflet-bottom.leaflet-left").append(controler)
+    $("#controler-bar").append(controler)
 }
 
 
@@ -287,8 +287,8 @@ $("#path_setter_validation").on("click", function() {
         var elevation_mode = "disabled"
     }
 
-    // var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://find-my-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+     var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+//    var url_build = `https://find-my-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
@@ -326,8 +326,8 @@ $("#view_setter_validation").on("click", function() {
     // mode selection
     var location = $('#location_value').val()
 
-    // var url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
-    var url_build = `https://find-my-path.herokuapp.com/api/v1/location?name=${location}`;
+     var url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
+//    var url_build = `https://find-my-path.herokuapp.com/api/v1/location?name=${location}`;
 
     $.ajax({
         url: url_build,
