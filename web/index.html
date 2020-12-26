@@ -26,24 +26,47 @@
         <link rel="stylesheet" type="text/css" href="static/style/map_controlers.css">
 
         <script src="https://d3js.org/d3.v5.min.js"></script>
-		<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
 
     </head>
 
     <body>
-        <div class="row">
 
-        <div class="col-sm-9">
-            <div id="map"></div>
-        </div>
+    <div class="container-fluid">
 
-        <div id="controler-bar" class="col-sm-3">
-        </div>
+            <div class="row">
 
+                <div class="col-md-9">
+                    <div id="map"></div>
+                </div>
 
-        </div>
+                <div id="right-bar" class="col-md-3">
+
+                    <div id="controler-bar" class="col-md-12">
+                        <div id="study_area">
+                            <div class="setter-title col-sm-12">1. Définir la zone d'étude</div>
+                        </div>
+
+                        <div id="nodes_builder">
+                            <div class="setter-title col-sm-12">2. Paramétrage</div>
+                        </div>
+
+                        <div id="outputs">
+                            <div class="setter-title col-sm-12">3. Exporter les résultats</div>
+                        </div>
+
+                    </div>
+
+                    <div id="nodes-bar" class="col-md-12">
+                        <div id="nodes_results">
+                            <div class="setter-title col-sm-12">Noeuds saisis</div>
+                        </div>
+                    </div>
+
+            </div>
+    </div>
 
 
 

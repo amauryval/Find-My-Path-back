@@ -1,113 +1,94 @@
 function ViewSetterHandler() {
     var controler = $(
-        '<div id="view_setter" class="legend-object">' +
-            '<div id="view-setter-container-title-container" class="legend-title">' +
-                '<div class="setter-title col-sm-12">Afficher un territoire</div>' +
-            '</div>' +
-            '<div id="view-setter-container" class="">' +
-                '<div class="setter-elements col-sm-1"></div>' +
-                '<div class="setter-elements col-sm-11 legend">' +
-                    '<div class="row">' +
-                        '<div class="col-sm-8">' +
-                            '<input class="input-xlarge" id="location_value" type="text" value="">' +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider*</button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>'
+        '<form class="col-sm-12">' +
+          '<div class="form-group">' +
+            '<label for="location_value">Secteur géographique</label>' +
+            '<input type="text" class="form-control" id="location_value" aria-describedby="location_value_help" placeholder="blabla">' +
+          '</div>' +
+          '<button id="view_setter_validation" type="submit" class="btn btn-primary">Valider</button>' +
+        '</form>'
     )
-    $("#controler-bar").append(controler)
+    $("#study_area").append(controler)
 }
 
 
 function PathSetterHandler() {
     var controler = $(
-        '<div id="path_setter" class="legend-object">' +
-            '<div id="path-setter-container-title-container" class="row legend-title">' +
-                '<div class="setter-title col-sm-12">Définir un chemin</div>' +
-            '</div>' +
+        '<form class="col-sm-12">' +
 
-            '<div id="view-setter-container" class="row">' +
-                 '<div class="setter-elements col-sm-1"></div>' +
-                 '<div class="setter-elements col-sm-11 legend">' +
-                    '<div class="row">' +
-                        '<div class="setter-elements col-sm-8">' +
-                            '<div class="setter-elements col-sm-12">' +
-                                 '<div class="setter-sub-title col-sm-12">Choisissez le mode</div>' +
-                                 '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
-                                    '<label class="btn btn-secondary active">' +
-                                        '<input type="radio" name="mode_options" value="pedestrian" id="mode_pedestrian" autocomplete="off" checked>pedestrian' +
-                                    '</label>' +
-                                    '<label class="btn btn-secondary">' +
-                                        '<input type="radio" name="mode_options" id="mode_vehicle" value="vehicle" autocomplete="off">vehicle' +
-                                    '</label>' +
-                                 '</div>' +
-                            '</div>' +
-                            '<div class="setter-elements col-sm-12">' +
-                                '<div class="setter-sub-title col-sm-12">Activer le mode édition</div>' +
-                                '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
-                                    '<label class="btn btn-secondary active">' +
-                                        '<input id="edition_mode" type="checkbox" unchecked autocomplete="off">Edition' +
-                                    '</label>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="setter-elements col-sm-12">' +
-                                '<div class="setter-sub-title col-sm-12">Activer le mode élevation</div>' +
-                                '<div class=" btn-group btn-group-toggle" data-toggle="buttons">' +
-                                    '<label class="btn btn-secondary active">' +
-                                        '<input id="elevation_mode" type="checkbox" unchecked autocomplete="off">Elevation' +
-                                    '</label>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-
-                        '<div class="setter-elements col-sm-4">' +
-                            '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
-                            '<p>si 1ere validation, attendez le démarrage de Heroku (quelques secondes...)</p>' +
-                        '</div>' +
-
-                        '<div class="setter-elements col-sm-12">' +
-                            '<div class="setter-sub-title col-sm-12">Noeuds définis</div>' +
-                            '<ol id="path_coords_list" class="col-sm-12"></ol>' +
-                        '</div>' +
+            '<fieldset class="form-group">' +
+                '<div class="row">' +
+                  '<legend class="col-form-label col-sm-2 pt-0">Modes</legend>' +
+                  '<div class="col-sm-10">' +
+                    '<div class="form-check">' +
+                        '<input type="radio" id="mode_pedestrian" name="mode_options" value="pedestrian">' +
+                        '<label for="mode_pedestrian">Marche à pied</label><br>' +
                     '</div>' +
-                 '</div>' +
-            '</div>' +
+                    '<div class="form-check">' +
+                        '<input type="radio" id="mode_vehicle" name="mode_options" value="vehicle">' +
+                        '<label for="mode_vehicle">Véhicules</label><br>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+            '</fieldset>' +
+
+            '<fieldset class="form-group">' +
+                '<div class="row">' +
+                  '<legend class="col-form-label col-sm-4 pt-0">Edition</legend>' +
+                  '<div class="col-sm-8">' +
+                    '<div class="form-check">' +
+                        '<input class="form-check-input" type="checkbox" value="" id="edition_mode">' +
+                        '<label class="form-check-label" for="edition_mode">Activer le mode édition</label>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+            '</fieldset>' +
+
+            '<fieldset class="form-group">' +
+                '<div class="row">' +
+                  '<legend class="col-form-label col-sm-4 pt-0">Elevation</legend>' +
+                  '<div class="col-sm-8">' +
+                    '<div class="form-check">' +
+                        '<input class="form-check-input" type="checkbox" value="" id="elevation_mode">' +
+                        '<label class="form-check-label" for="elevation_mode">Calcul de la courbe topographique</label>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+            '</fieldset>' +
+
+            '<button id="path_setter_validation" type="submit" class="btn btn-primary">Valider</button>' +
+        '</form>'
+    )
+    $("#nodes_builder").append(controler)
+}
+
+function NodesPart() {
+    var nodes_content = $(
+        '<div class="col-sm-12">' +
+            '<ol id="path_coords_list"></ol>' +
         '</div>'
     )
-    $("#controler-bar").append(controler)
+    $("#nodes_results").append(nodes_content)
 }
+
+
 
 function DownloadSetterHandler() {
     var controler = $(
-        '<div id="download_setter" class="legend-object">' +
-            '<div id="view-setter-container-title-container" class="row legend-title">' +
-                '<div class="setter-title col-sm-12">Exporter les résultats</div>' +
-            '</div>' +
-            '<div id="view-setter-container" class="row">' +
-                '<div class="setter-elements col-sm-1"></div>' +
-                '<div class="setter-elements col-sm-11 legend">' +
-                    '<div class="row">' +
-                        '<div class="setter-elements col-sm-6">' +
-                            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Export des noeuds</button>' +
-                        '</div>' +
-                        '<div class="setter-elements col-sm-6">' +
-                            '<button class="btn btn-secondary" onclick="downloadPath()">Export du chemin</button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
+        '<div class="col-sm-6">' +
+            '<button class="btn btn-secondary" onclick="downloadNodesPath()">Noeuds</button>' +
+        '</div>' +
+        '<div class="col-sm-6">' +
+            '<button class="btn btn-secondary" onclick="downloadPath()">Chemin</button>' +
         '</div>'
     )
-    $("#controler-bar").append(controler)
+    $("#outputs").append(controler)
 }
 
 
 ViewSetterHandler()
 PathSetterHandler()
+NodesPart()
 DownloadSetterHandler()
 
 
@@ -138,34 +119,31 @@ function GetCoordinatesOnClick(e) {
     var edition_mode_status = $("#edition_mode")
     if ( edition_mode_status.is(':checked') ) {
 
-        var coord_data = $('<div class="col-sm-9 input-group coordinate_content">' +
-          // '<div class="input-group-prepend">' +
-            '<span class="centered">Etape N°' + ($("#path_coords_list li").length + 1) + '</span>' +
-          // '</div>' +
-          '<textarea class="centered" aria-label="With textarea"></textarea>' +
-        '</div>')
+        var coord_data = $(
+            '<div class="coords_element">' +
+                '<div class="input-group coordinate_content">' +
+                    '<span class="centered">Noeud ' + ($("#path_coords_list li").length + 1) + '</span>' +
+                    '<input type="text" class="centered" aria-label="With textarea">' +
+                    '<span class="remove"><a href="#"><i class="svg-icon fas fa-trash"></i></a></span>' +
+                    '<span class="up"><a href="#"><i class="svg-icon fas fa-arrow-up"></i></a></span>' +
+                    '<span class="down"><a href="#"><i class="svg-icon fas fa-arrow-down"></i></a></span>' +
+                '</div>' +
+            '</div>'
+        )
 
         coord_data.attr("data-x", e.latlng.lng)
         coord_data.attr("data-y", e.latlng.lat)
 
-        var coord_info = $(
-            '<div class="row coords_element">' +
-                coord_data[0].outerHTML +
-                '<span class="centered right remove"><a href="#"><i class="svg-icon fas fa-trash"></i></a></span>' +
-                '<span class="centered right up"><a href="#"><i class="svg-icon fas fa-arrow-up"></i></a></span>' +
-                '<span class="centered right down"><a href="#"><i class="svg-icon fas fa-arrow-down"></i></a></span>' +
-            '</div>'
-        )
 
         // to activate keyboard event because we have to wait the page... tricky...
         $(document).ready(function() {
-            $("textarea").keyup(function (e) {
+            $(".coords_element").keyup(function (e) {
                 MapPathNodes()
             });
         })
 
         $("#path_coords_list").append(
-            $('<li>').append(coord_info)
+            $('<li>').append(coord_data)
         )
 
         $('#path_coords_list li').on("mouseover", function (d) {
@@ -192,7 +170,7 @@ function MapPathNodes() {
         "type": "FeatureCollection",
         "features": []
     }
-    $(".coordinate_content").each(function(i) {
+    $(".coords_element").each(function(i) {
         pathNodesData.features.push(
             {
                 "type": "Feature",
@@ -200,7 +178,7 @@ function MapPathNodes() {
                     "position": i + 1,
                     "topo_uuid": i,
                     "id": i,
-                    "name":  $(this).find("textarea")[0].value
+                    "name":  $(this).find("input")[0].value
                 },
                 "geometry": {
                     "type": "Point",

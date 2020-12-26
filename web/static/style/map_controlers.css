@@ -42,11 +42,15 @@
 .setter-title {
     font-size: larger;
     font-weight: bold;
-    padding-bottom: 10px;
+    /*padding-bottom: 10px;*/
 }
 
 .btn {
     margin-left: 10px;
+}
+
+#controler-bar {
+    height: 55%;
 }
 
 .setter-sub-title {
@@ -60,13 +64,14 @@
 }
 
 .svg-icon {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 #path_coords_list {
-    padding-left: 4em;
+    /*padding-left: 4em;*/
     max-height: 200px;
     overflow-x: hidden;
+        padding-left: 20px;
 }
 
 .btn {
@@ -79,7 +84,7 @@ textarea {
 }
 
 .centered {
-    margin: auto;
+    margin-right: 5px;
     height: 25px;
 }
 
