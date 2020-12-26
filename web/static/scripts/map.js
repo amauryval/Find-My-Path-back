@@ -12,17 +12,13 @@ var background_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}
 var map = L.map(
     'map',
      {
-     	// zoom: min_zoom,
+     	zoom: min_zoom,
         zoomControl: true
      }
 ).addLayer(background_map).setView(
 	[45.754649, 4.858618],
 	10,
 );
-setTimeout(() => {
-    map.invalidateSize()
-}, 100)
-$('.leaflet-bottom.leaflet-right').insertAfter('.leaflet-top.leaflet-right');
 
 // disableMapInteractivity(map);
 

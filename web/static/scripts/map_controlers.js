@@ -3,9 +3,9 @@ function ViewSetterHandler() {
         '<form class="col-sm-12">' +
           '<div class="form-group">' +
             '<label for="location_value">Secteur géographique</label>' +
-            '<input type="text" class="form-control" id="location_value" aria-describedby="location_value_help" placeholder="blabla">' +
+            '<input type="text" class="form-control" id="location_value">' +
           '</div>' +
-          '<button id="view_setter_validation" type="submit" class="btn btn-primary">Valider</button>' +
+          '<button id="view_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
         '</form>'
     )
     $("#study_area").append(controler)
@@ -56,7 +56,7 @@ function PathSetterHandler() {
                 '</div>' +
             '</fieldset>' +
 
-            '<button id="path_setter_validation" type="submit" class="btn btn-primary">Valider</button>' +
+            '<button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>' +
         '</form>'
     )
     $("#nodes_builder").append(controler)
@@ -265,8 +265,8 @@ $("#path_setter_validation").on("click", function() {
         var elevation_mode = "disabled"
     }
 
-     var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
-//    var url_build = `https://find-my-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+     // var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
+   var url_build = `https://find-my-path.herokuapp.com/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
 
     $.ajax({
         url: url_build,
@@ -302,14 +302,14 @@ $("#path_setter_validation").on("click", function() {
 
 $("#view_setter_validation").on("click", function() {
     // mode selection
-    var location = $('#location_value').val()
+    let location = $('#location_value').val()
 
-     var url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
-//    var url_build = `https://find-my-path.herokuapp.com/api/v1/location?name=${location}`;
+     // let url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
+   let url_build = `https://find-my-path.herokuapp.com/api/v1/location?name=${location}`;
 
     $.ajax({
         url: url_build,
-        async: true,
+        // async: true,
         success: function (result) {
             if ( result["bbox"] === 'Not found') {
                 alert("Location not found")
