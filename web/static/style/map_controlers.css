@@ -1,7 +1,12 @@
 
 #topo_chart {
-    /*margin: unset;*/
-    width: fit-content;
+height: 30%;
+    /*width: 23vw;*/
+}
+
+#right-bar {
+        width: 100vh;
+        height: 100vh;
 }
 
 .legend-object {
@@ -54,8 +59,13 @@
     margin-left: 10px;
 }
 
+#title-bar {
+    height: 10%;
+}
+
+
 #controler-bar {
-    height: 55%;
+    height: 50%;
 }
 
 .setter-sub-title {
@@ -102,8 +112,8 @@ textarea {
 }
 
 .tooltip {
-    /*margin: 15px;*/
-    /*background-color: grey;*/
-    /*border-radius: 15px;*/
-    /*border: 1px solid black;*/
+    margin: 15px;
+    background-color: grey;
+    border-radius: 15px;
+    border: 1px solid black;
 }

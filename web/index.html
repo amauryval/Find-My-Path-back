@@ -38,11 +38,11 @@
 
             <div class="row">
 
-                <div class="col-md-9">
+                <div class="col-md-8">
                     <div id="map"></div>
                 </div>
 
-                <div id="right-bar" class="col-md-3">
+                <div id="right-bar" class="col-md-4">
 
                     <div id="title-bar">
 
@@ -136,7 +136,10 @@
                             <a class="nav-link active" id="nodes-tab" data-toggle="tab" href="#nodes" role="tab" aria-controls="home" aria-selected="true">Noeuds saisis</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="profile" aria-selected="false">Statistiques</a>
+                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stat" aria-selected="false">Statistiques</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" id="topo-tab" data-toggle="tab" href="#topo" role="tab" aria-controls="topo" aria-selected="false">Topographie</a>
                           </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
@@ -151,13 +154,12 @@
                           <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stats-tab">
                             <div id="stats_results"></div>
 
-                            <div class="setter-sub-title col-sm-12">Courbe topographique</div>
-                            <div id="topo_chart" class="setter-elements col-sm-11 legend">
-                                <div class="col-sm-12">
-                                    <div id="svgTopoChart"></div>
-                                </div>
-                            </div>
+                          </div>
 
+                          <div class="tab-pane fade" id="topo" role="tabpanel" aria-labelledby="topo-tab">
+                            <div id="topo_chart">
+                                <div id="svgTopoChart"></div>
+                            </div>
                           </div>
 
                         </div>
