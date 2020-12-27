@@ -3,18 +3,11 @@ function createTopoChart() {
 
     function topoChartHandler() {
         var chart = $(
-            '<div id="chart_setter" class="container leaflet-control legend-object">' +
-                '<div id="view-setter-container-title-container" class="row legend-title">' +
-                    '<div class="setter-title col-sm-12">Courbe topographique</div>' +
-                '</div>' +
-                '<div id="view-setter-container" class="row">' +
-                    '<div class="setter-elements col-sm-1"></div>' +
-                    '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
-                            '<div class="col-sm-12">' +
-                                '<div id="svgTopoChart"></div>' +
-                            '</div>' +
+            '<div class="setter-sub-title col-sm-12">Courbe topographique</div>' +
+            '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
+                    '<div class="col-sm-12">' +
+                        '<div id="svgTopoChart"></div>' +
                     '</div>' +
-                '</div>' +
             '</div>'
         )
 
