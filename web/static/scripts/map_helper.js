@@ -31,7 +31,10 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
         .enter()
         .append("circle", ".PathNodes")
         .attr("class", "PathNodes")
-        .attr("r", "10")
+        .attr("r", "15")
+        .attr("id", function(d) {
+            return d.properties.id
+        })
         // .append('text')
         //     .attr("class", "PathNodes")
         //     .text(function(d) { return '\uf3c5'; })
@@ -58,8 +61,8 @@ function mapPoints(geojson_nodes, idxToSelect, id) {
                     console.log("done")
                     d3.select(this).attr("transform", function (d) {
                         var new_coordinates = applyLayerToLatLng([d3.event.x, d3.event.y])
-                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coordinate_content').attr("data-x", new_coordinates.lng)
-                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coordinate_content').attr("data-y", new_coordinates.lat)
+                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coords_element').data("data-x", new_coordinates.lng)
+                        $('#path_coords_list li:nth-of-type(' + d.properties.position + ') .coords_element').data("data-y", new_coordinates.lat)
                         MapPathNodes()
                     })
                 }

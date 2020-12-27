@@ -45,24 +45,105 @@
                 <div id="right-bar" class="col-md-3">
 
                     <div id="controler-bar" class="col-md-12">
+
                         <div id="study_area">
                             <div class="setter-title col-sm-12">1. Définir la zone d'étude</div>
+                            <form class="col-sm-12">
+                              <div class="form-group">
+                                <label for="location_value">Secteur géographique</label>
+                                <input type="text" class="form-control" id="location_value">
+                              </div>
+                              <button id="view_setter_validation" type="button" class="btn btn-primary">Valider</button>
+                            </form>
                         </div>
 
                         <div id="nodes_builder">
                             <div class="setter-title col-sm-12">2. Paramétrage</div>
+                            <form class="col-sm-12">
+
+                                <fieldset class="form-group">
+                                    <div class="row">
+                                      <legend class="col-form-label col-sm-4 pt-0">Edition</legend>
+                                      <div class="col-sm-8">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="edition_mode">
+                                            <label class="form-check-label" for="edition_mode">Activer le mode édition</label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="form-group">
+                                    <div class="row">
+                                      <legend class="col-form-label col-sm-2 pt-0">Modes</legend>
+                                      <div class="col-sm-10">
+                                        <div class="form-check">
+                                            <input type="radio" id="mode_pedestrian" name="mode_options" value="pedestrian">
+                                            <label for="mode_pedestrian">Marche à pied</label><br>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" id="mode_vehicle" name="mode_options" value="vehicle">
+                                            <label for="mode_vehicle">Véhicule</label><br>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="form-group">
+                                    <div class="row">
+                                      <legend class="col-form-label col-sm-4 pt-0">Elevation</legend>
+                                      <div class="col-sm-8">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="elevation_mode">
+                                            <label class="form-check-label" for="elevation_mode">Calcul de la courbe topographique</label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </fieldset>
+                                <button id="path_setter_validation" type="button" class="btn btn-primary">Valider</button>
+                            </form>
                         </div>
 
-                        <div id="outputs">
+                        <div id="exports">
                             <div class="setter-title col-sm-12">3. Exporter les résultats</div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-secondary" onclick="downloadNodesPath()">Noeuds</button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-secondary" onclick="downloadPath()">Chemin</button>
+                            </div>'
                         </div>
 
                     </div>
 
                     <div id="nodes-bar" class="col-md-12">
-                        <div id="nodes_results">
-                            <div class="setter-title col-sm-12">Noeuds saisis</div>
+
+                        <div class="setter-title col-sm-12">Résultats</div>
+
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                          <li class="nav-item">
+                            <a class="nav-link active" id="nodes-tab" data-toggle="tab" href="#nodes" role="tab" aria-controls="home" aria-selected="true">Noeuds saisis</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="profile" aria-selected="false">Statistiques</a>
+                          </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+
+                          <div class="tab-pane fade show active" id="nodes" role="tabpanel" aria-labelledby="nodes-tab">
+                            <div id="nodes_results">
+                                <div class="setter-title col-sm-12"></div>
+                                <ol id="path_coords_list"></ol>
+                            </div>
+                          </div>
+
+                          <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                            <div id="stats_results"></div>
+
+                          </div>
+
                         </div>
+
                     </div>
 
             </div>

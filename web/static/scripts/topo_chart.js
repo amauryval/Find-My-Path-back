@@ -19,7 +19,7 @@ function createTopoChart() {
         )
 
         $("#chart_setter").remove()
-        $(".leaflet-top.leaflet-right").append(chart)
+        $("#stats").append(chart)
 
     }
 
