@@ -71,7 +71,7 @@ def app():
         }
 
         try:
-            geojson_points_data, geojson_line_data = ComputePath(
+            geojson_points_data, geojson_line_data, path_stats = ComputePath(
                 mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"],
                 elevation_mode=url_arg_keys["elevation_mode"],
@@ -80,7 +80,8 @@ def app():
             output = jsonify(
                 {
                     "points_path": geojson_points_data,
-                    "line_path": geojson_line_data
+                    "line_path": geojson_line_data,
+                    "stats_path": path_stats
                 }
             )
 

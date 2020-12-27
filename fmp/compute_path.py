@@ -30,6 +30,9 @@ class ComputePath:
 
     def __init__(self, geojson, mode, elevation_mode="disabled"):
 
+        self._elevation_values = []
+        self._distance_value = 0
+
         self._geojson = json.loads(geojson)
         self._mode = mode
         self._elevation_mode = elevation_mode
@@ -56,11 +59,18 @@ class ComputePath:
         output_path = self.compute_path()
         geojson_points_data = self.to_geojson_points(output_path)
         geojson_line_data = self.to_geojson_linestring(output_path)
-        return geojson_points_data, geojson_line_data
+
+        path_stats = {
+            "elevation_min": min(self._elevation_values),
+            "elevation_max": max(self._elevation_values),
+            "elevation_diff": max(self._elevation_values) - min(self._elevation_values),
+            "longer": self._distance_value
+        }
+
+        return geojson_points_data, geojson_line_data, path_stats
 
     def to_geojson_points(self, data):
         features = []
-        distance_found = 0
         for path in data:
             for enum, node_coord in enumerate(path["geometry"]):
                 nodes_to_proceed = path["geometry"][:enum + 1]
@@ -70,7 +80,9 @@ class ComputePath:
                     distance_point = 0
 
                 if self._elevation_mode == "enabled":
+                    # TODO check Z value
                     elevation = node_coord[-1]
+                    self._elevation_values.append(elevation)
                 else:
                     elevation = -9999
 
@@ -79,12 +91,12 @@ class ComputePath:
                         "type": "Feature",
                         "properties": {
                             "elevation": elevation,
-                            "distance": distance_found + distance_point
+                            "distance": self._distance_value + distance_point
                         },
                         "geometry": mapping(Point(node_coord))
                     }
                 )
-            distance_found += distance_point
+            self._distance_value += distance_point
 
         return {
             "type": "FeatureCollection",
