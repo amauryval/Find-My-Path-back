@@ -1,22 +1,6 @@
 
 function createTopoChart() {
-
-    function topoChartHandler() {
-        var chart = $(
-            '<div class="setter-sub-title col-sm-12">Courbe topographique</div>' +
-            '<div id="topo_chart" class="setter-elements col-sm-11 legend">' +
-                    '<div class="col-sm-12">' +
-                        '<div id="svgTopoChart"></div>' +
-                    '</div>' +
-            '</div>'
-        )
-
-        $("#chart_setter").remove()
-        $("#stats").append(chart)
-
-    }
-
-    topoChartHandler()
+    $("#svgTopoChart svg").remove()
 
     // Set the dimensions of the canvas / graph
     var	margin = {top: 30, right: 20, bottom: 30, left: 50},
