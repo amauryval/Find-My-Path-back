@@ -45,6 +45,11 @@
     /*padding-bottom: 10px;*/
 }
 
+.card {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
 .btn {
     margin-left: 10px;
 }

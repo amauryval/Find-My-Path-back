@@ -44,7 +44,16 @@
 
                 <div id="right-bar" class="col-md-3">
 
-                    <div id="controler-bar" class="col-md-12">
+                    <div id="title-bar">
+
+                        <h1 class="setter-title col-sm-12">FindMyPath</h1>
+                        <p id="description" class="col-sm-12">
+                            TODO.
+                        </p>
+
+                        </div>
+
+                    <div id="controler-bar" class="card">
 
                         <div id="study_area">
                             <div class="setter-title col-sm-12">1. Définir la zone d'étude</div>
@@ -75,8 +84,8 @@
 
                                 <fieldset class="form-group">
                                     <div class="row">
-                                      <legend class="col-form-label col-sm-2 pt-0">Modes</legend>
-                                      <div class="col-sm-10">
+                                      <legend class="col-form-label col-sm-4 pt-0">Modes</legend>
+                                      <div class="col-sm-8">
                                         <div class="form-check">
                                             <input type="radio" id="mode_pedestrian" name="mode_options" value="pedestrian">
                                             <label for="mode_pedestrian">Marche à pied</label><br>
@@ -106,17 +115,19 @@
 
                         <div id="exports">
                             <div class="setter-title col-sm-12">3. Exporter les résultats</div>
-                            <div class="col-sm-6">
-                                <button class="btn btn-secondary" onclick="downloadNodesPath()">Noeuds</button>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <button id="export_nodes" class="btn btn-secondary">Noeuds</button>
+                                        <button id="export_path" class="btn btn-secondary">Chemin</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-sm-6">
-                                <button class="btn btn-secondary" onclick="downloadPath()">Chemin</button>
-                            </div>'
                         </div>
 
                     </div>
 
-                    <div id="nodes-bar" class="col-md-12">
+                    <div id="results-bar" class="">
 
                         <div class="setter-title col-sm-12">Résultats</div>
 
@@ -152,6 +163,8 @@
                         </div>
 
                     </div>
+
+                </div>
 
             </div>
     </div>

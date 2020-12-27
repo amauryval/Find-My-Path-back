@@ -76,7 +76,10 @@ function GetCoordinatesOnClick(e) {
 map.on('click', GetCoordinatesOnClick)
 
 
-var pathNodesData;
+var pathNodesData = {
+    "type": "FeatureCollection",
+    "features": []
+};
 var linePathData;
 var PointPathData;
 
@@ -113,18 +116,17 @@ function MapPathNodes() {
 
 }
 
-function downloadNodesPath() {
+$("#export_nodes").on("click", function() {
     if (pathNodesData.type === "FeatureCollection") {
         download("nodes_path.geojson", pathNodesData)
     }
-}
+})
 
-function downloadPath() {
+$("#export_path").on("click", function() {
     if (linePathData.type === "FeatureCollection") {
         download("path.geojson", linePathData)
     }
-
-}
+})
 
 
 function download(filename, text) {
@@ -150,7 +152,12 @@ $("#path_setter_validation").on("click", function() {
     } else if ( mode_pedestrian.is(':checked') ) {
         var mode = mode_pedestrian.attr("value")
     } else {
-        alert("Choose a mode please")
+        alert("Séléctionnez un mode")
+        return
+    }
+
+    if ( pathNodesData.features.length <= 1 ) {
+        alert("Saisir au minimum 2 noeuds sur la carte")
         return
     }
 
@@ -192,11 +199,16 @@ $("#path_setter_validation").on("click", function() {
 })
 
 
+
 $("#view_setter_validation").on("click", function() {
     // mode selection
     let location = $('#location_value').val()
+    if ( location.length === 0 ) {
+        alert("Définissez une zone d'étude avant de valider.")
+        return
+    }
 
-     // let url_build = `http://localhost:5000/api/v1/location?name=${JSON.stringify(pathNodesData)}`;
+     // let url_build = `http://localhost:5000/api/v1/location?name=${location}`;
    let url_build = `https://find-my-path.herokuapp.com/api/v1/location?name=${location}`;
 
     $.ajax({
@@ -204,7 +216,7 @@ $("#view_setter_validation").on("click", function() {
         // async: true,
         success: function (result) {
             if ( result["bbox"] === 'Not found') {
-                alert("Location not found")
+                alert("Zone d'étude non trouvée")
             } else {
 
                 map.fitBounds([
