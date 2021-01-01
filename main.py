@@ -65,7 +65,7 @@ def app():
     def get_path():
 
         url_arg_keys = {
-            "elevation_mode": request.args.get('elevation_mode', type=str),
+            "elevation_mode": request.args.get('elevation_mode', type=bool),
             "mode": request.args.get('mode', type=str),
             "geojson": request.args.get('geojson', type=str),
         }

@@ -162,9 +162,9 @@ $("#path_setter_validation").on("click", function() {
     }
 
     let elevation_status = $("#elevation_mode")
-    var elevation_mode = "disabled"
+    var elevation_mode = ""
     if ( elevation_status.is(':checked') ) {
-        var elevation_mode = "enabled"
+        var elevation_mode = true
     }
 
      // var url_build = `http://localhost:5000/api/v1/path?elevation_mode=${elevation_mode}&mode=${mode}&geojson=${JSON.stringify(pathNodesData)}`;
@@ -188,7 +188,7 @@ $("#path_setter_validation").on("click", function() {
                 animatePointOnLine(PointPathData, "SvgPathBuildAnimated")
                 $("#svgTopoChart svg").remove()
 
-                if ( elevation_mode === "enabled" ) {
+                if ( elevation_mode ) {
                     createTopoChart()
                 }
 

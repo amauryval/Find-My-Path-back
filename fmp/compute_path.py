@@ -28,13 +28,14 @@ class ComputePath:
 
     __API_MAPZEN_URL = "https://api.opentopodata.org/v1/mapzen?"
 
-    def __init__(self, geojson, mode, elevation_mode="disabled"):
+    def __init__(self, geojson, mode, elevation_mode):
 
         self._elevation_values = []
         self._distance_value = 0
 
         self._geojson = json.loads(geojson)
         self._mode = mode
+        # TODO : elevation should be a boolean
         self._elevation_mode = elevation_mode
 
     def prepare_data(self):
@@ -60,11 +61,15 @@ class ComputePath:
         geojson_points_data = self.to_geojson_points(output_path)
         geojson_line_data = self.to_geojson_linestring(output_path)
 
+        if not self._elevation_mode:
+            self._elevation_values = [0]
+
         path_stats = {
-            "elevation_min": min(self._elevation_values),
-            "elevation_max": max(self._elevation_values),
-            "elevation_diff": max(self._elevation_values) - min(self._elevation_values),
-            "longer": self._distance_value
+            "nodes_count": len(self._input_nodes_data),
+            "height_min": min(self._elevation_values),
+            "height_max": max(self._elevation_values),
+            "height_diff": max(self._elevation_values) - min(self._elevation_values),
+            "length": self._distance_value
         }
 
         return geojson_points_data, geojson_line_data, path_stats
@@ -79,7 +84,7 @@ class ComputePath:
                 else:
                     distance_point = 0
 
-                if self._elevation_mode == "enabled":
+                if self._elevation_mode:
                     # TODO check Z value
                     elevation = node_coord[-1]
                     self._elevation_values.append(elevation)
@@ -154,7 +159,7 @@ class ComputePath:
                 (output_gdf["source_node"] == source_node_wkt) & (output_gdf["target_node"] == target_node_wkt)
             ].iloc[0]["geometry"].coords
 
-            if self._elevation_mode == "enabled":
+            if self._elevation_mode:
                 geom_data = self.get_elevation(geom_data)
 
             output_paths.append({
