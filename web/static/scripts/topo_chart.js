@@ -19,7 +19,7 @@ function createTopoChart() {
     // Define the line
     var	line_value = d3.line()
         .x(function(d) { return x(d.properties.distance); })
-        .y(function(d) { return y(d.properties.elevation); })
+        .y(function(d) { return y(d.properties.height); })
         .curve(d3.curveCatmullRom);
 
     // Adds the svg canvas
@@ -34,8 +34,8 @@ function createTopoChart() {
     // Scale the range of the data
     x.domain(d3.extent(data, function(d) { return d.properties.distance; }));
     y.domain([
-        d3.min(data, function(d) { return d.properties.elevation; }) - 5,
-        d3.max(data, function(d) { return d.properties.elevation; }) + 5]
+        d3.min(data, function(d) { return d.properties.height; }) - 5,
+        d3.max(data, function(d) { return d.properties.height; }) + 5]
     );
 
     // Add the line_value path.
@@ -62,7 +62,7 @@ function createTopoChart() {
         return x(d.properties.distance)
       })
       .attr("cy", function(d) {
-        return y(d.properties.elevation)
+        return y(d.properties.height)
       })
         .on("mouseover", function(d) {
             d3.select(this).attr("r", 6)
@@ -75,7 +75,7 @@ function createTopoChart() {
             tooltip_div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip_div.html("<p>Altitude: " + d.properties.elevation + " mètres<br>Distance: " + Math.round(d.properties.distance, 1)  + " mètres</p>")
+            tooltip_div.html("<p>Altitude: " + d.properties.height + " mètres<br>Distance: " + Math.round(d.properties.distance, 1)  + " mètres</p>")
                 .style("left", (d3.event.pageX + 25) + "px")
                 .style("top", (d3.event.pageY - 25) + "px");
 

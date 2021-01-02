@@ -95,7 +95,7 @@ class ComputePath:
                     {
                         "type": "Feature",
                         "properties": {
-                            "elevation": elevation,
+                            "height": elevation,
                             "distance": self._distance_value + distance_point
                         },
                         "geometry": mapping(Point(node_coord))
