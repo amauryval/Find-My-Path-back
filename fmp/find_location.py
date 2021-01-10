@@ -13,9 +13,7 @@ class FindLocation:
         self._location_name = location_name
 
     def run(self):
-        print(self._location_name)
         location_found = NominatimApi(logger=OsmGtCore().logger, q=self._location_name, limit=1).data()
-        print(location_found)
         if len(location_found) >= 1:
             return location_found[0]["boundingbox"]
         else:

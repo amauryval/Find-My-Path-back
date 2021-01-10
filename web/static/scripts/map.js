@@ -10,7 +10,7 @@ var background_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}
 });
 
 var map = L.map(
-    'map',
+    'map',applyLatLngToLayer
      {
      	zoom: min_zoom,
         zoomControl: true

@@ -41,7 +41,7 @@ def app():
             bbox = FindLocation(
                 url_arg_keys["name"]
             ).run()
-
+            print("bbam")
             output = jsonify(
                 {
                     "bbox": bbox
@@ -49,16 +49,20 @@ def app():
             )
 
         except LocationNotFound as _:
-            output = jsonify(
-                {
-                    "bbox": "Not found"
-                }
-            )
-        # except (ValueError) as err:
-        #     err = repr(err)
-        #     return bad_request(err, 400)
+            return bad_request("area not found", 400)
+
 
         output.headers.add('Access-Control-Allow-Origin', '*')
+        return output
+
+    @find_my_path.route('/health', methods=['GET'])
+    def get_api_status():
+        output = jsonify(
+            {
+                "status": "Ready"
+            }
+        )
+
         return output
 
     @find_my_path.route('/path', methods=['GET'])
