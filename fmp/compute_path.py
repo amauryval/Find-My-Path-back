@@ -10,6 +10,7 @@ from operator import itemgetter
 from fmp.core.geometry import compute_wg84_line_length
 
 import requests
+import uuid
 
 
 class ReduceYouPathArea(Exception):
@@ -18,6 +19,14 @@ class ReduceYouPathArea(Exception):
 
 class ErrorComputePath(Exception):
     pass
+
+
+import string
+import random
+
+
+def id_generator(size=10):
+    return ''.join(random.choice(string.ascii_uppercase) for _ in range(size))
 
 
 class ComputePath:
@@ -76,6 +85,7 @@ class ComputePath:
 
     def to_geojson_points(self, data):
         features = []
+        current_step = None
         for path in data:
             for enum, node_coord in enumerate(path["geometry"]):
                 nodes_to_proceed = path["geometry"][:enum + 1]
@@ -96,7 +106,9 @@ class ComputePath:
                         "type": "Feature",
                         "properties": {
                             "height": elevation,
-                            "distance": self._distance_value + distance_point
+                            "distance": self._distance_value + distance_point,
+                            "step": path["path_step"],
+                            "uuid": id_generator()
                         },
                         "geometry": mapping(Point(node_coord))
                     }
