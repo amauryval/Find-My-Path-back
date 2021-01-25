@@ -10,7 +10,6 @@ from operator import itemgetter
 from fmp.core.geometry import compute_wg84_line_length
 
 import requests
-import uuid
 
 
 class ReduceYouPathArea(Exception):
@@ -34,41 +33,44 @@ class ComputePath:
     __DEFAULT_EPSG = 4326
     __METRIC_EPSG = 3857
     __CHUNK_SIZE = 99  # api mapzen limit == 100
-
+    __AREA_SIZE_TO_WORK = 500  # meters
+    __MAX_AREA_SIZE = 10000  # meters
     __API_MAPZEN_URL = "https://api.opentopodata.org/v1/mapzen?"
 
-    def __init__(self, geojson, mode, elevation_mode):
+    def __init__(self, path_name, geojson, mode, elevation_mode, is_loop):
 
         self._elevation_values = []
         self._distance_value = 0
 
+        self._path_name = path_name
         self._geojson = json.loads(geojson)
         self._mode = mode
         # TODO : elevation should be a boolean
         self._elevation_mode = elevation_mode
+        self._is_loop = is_loop
 
     def prepare_data(self):
         self._input_nodes_data = gpd.GeoDataFrame.from_features(self._geojson["features"])
 
         bound_proceed = self._input_nodes_data.copy(deep=True)
-        bound_proceed.set_crs(epsg=4326, inplace=True)
-        bound_proceed.to_crs(epsg=3857, inplace=True)
-        bound_proceed["geometry"] = bound_proceed.geometry.buffer(500)
+        bound_proceed.set_crs(epsg=self.__DEFAULT_EPSG, inplace=True)
+        bound_proceed.to_crs(epsg=self.__METRIC_EPSG, inplace=True)
+        bound_proceed["geometry"] = bound_proceed.geometry.buffer(self.__AREA_SIZE_TO_WORK)
 
-        bbox_3857 = bound_proceed.geometry.total_bounds
-        min_x, min_y, max_x, max_y = bbox_3857
-        if LineString([(min_x, min_y), (max_x, max_y)]).length > 10000:
+        bbox = bound_proceed.geometry.total_bounds
+        min_x, min_y, max_x, max_y = bbox
+        if LineString([(min_x, min_y), (max_x, max_y)]).length > self.__MAX_AREA_SIZE:
             raise ReduceYouPathArea()
 
-        bound_proceed.to_crs(epsg=4326, inplace=True)
+        bound_proceed.to_crs(epsg=self.__DEFAULT_EPSG, inplace=True)
         return bound_proceed.geometry.total_bounds
 
     def run(self):
         self._bbox_to_use = self.prepare_data()
 
         output_path = self.compute_path()
-        geojson_points_data = self.to_geojson_points(output_path)
-        geojson_line_data = self.to_geojson_linestring(output_path)
+        geojson_points_data = self.to_geojson_points(self._path_name, output_path)
+        geojson_line_data = self.to_geojson_linestring(self._path_name, output_path)
 
         if not self._elevation_mode:
             self._elevation_values = [0]
@@ -83,9 +85,9 @@ class ComputePath:
 
         return geojson_points_data, geojson_line_data, path_stats
 
-    def to_geojson_points(self, data):
+    def to_geojson_points(self, path_name, data):
         features = []
-        current_step = None
+        point_position = 0
         for path in data:
             for enum, node_coord in enumerate(path["geometry"]):
                 nodes_to_proceed = path["geometry"][:enum + 1]
@@ -105,14 +107,16 @@ class ComputePath:
                     {
                         "type": "Feature",
                         "properties": {
+                            "position": str(point_position),
+                            "uuid": id_generator(),
+                            "path_name": path_name,
                             "height": elevation,
                             "distance": self._distance_value + distance_point,
-                            "step": path["path_step"],
-                            "uuid": id_generator()
                         },
                         "geometry": mapping(Point(node_coord))
                     }
                 )
+                point_position += 1
             self._distance_value += distance_point
 
         return {
@@ -121,7 +125,7 @@ class ComputePath:
         }
 
     @staticmethod
-    def to_geojson_linestring(data):
+    def to_geojson_linestring(path_name, data):
 
         return {
             "type": "FeatureCollection",
@@ -129,9 +133,10 @@ class ComputePath:
                 {
                     "type": "Feature",
                     "properties": {
+                        "path_position": feature["path_step"],
+                        "path_name": path_name,
                         "source_node": feature["source_node"],
                         "target_node": feature["target_node"],
-                        "path_step": feature["path_step"],
                         "length": compute_wg84_line_length(LineString(feature["geometry"]))
                     },
                     "geometry": mapping(LineString(feature["geometry"])),
@@ -149,6 +154,16 @@ class ComputePath:
             }
             for _, row in self._input_nodes_data.iterrows()
         ]
+
+        if self._is_loop:
+            loop_position = len(nodes_path) - 1
+            loop_geometry = nodes_path[0]["geometry"]
+            nodes_path.append(
+                {
+                    "position": loop_position, "geometry": loop_geometry
+                }
+            )
+
         nodes_path_ordered = sorted(nodes_path, key=itemgetter('position'), reverse=False)
         paths_to_compute = list(zip(nodes_path_ordered, nodes_path_ordered[1:]))
 
@@ -159,7 +174,7 @@ class ComputePath:
 
         output_gdf = OsmGt.shortest_path_from_bbox(
             self._bbox_to_use,
-            path_ordered.values(),
+            list(path_ordered.values()),
             self._mode,
         )
 

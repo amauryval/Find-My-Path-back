@@ -13,6 +13,8 @@ from fmp.compute_path import ReduceYouPathArea
 from fmp.find_location import FindLocation
 from fmp.find_location import LocationNotFound
 
+from osmgt.compoments.core import EmptyData
+
 
 def app():
 
@@ -69,36 +71,36 @@ def app():
     def get_path():
 
         url_arg_keys = {
+            "path_name": request.args.get('path_name', type=str),
             "elevation_mode": request.args.get('elevation_mode', type=bool),
             "mode": request.args.get('mode', type=str),
             "geojson": request.args.get('geojson', type=str),
+            "is_loop": request.args.get('is_loop', type=str),
+
         }
 
         try:
             geojson_points_data, geojson_line_data, path_stats = ComputePath(
+                path_name=url_arg_keys["path_name"],
                 mode=url_arg_keys["mode"],
                 geojson=url_arg_keys["geojson"],
                 elevation_mode=url_arg_keys["elevation_mode"],
+                is_loop=url_arg_keys["is_loop"],
             ).run()
 
-            output = jsonify(
-                {
-                    "points_path": geojson_points_data,
-                    "line_path": geojson_line_data,
-                    "stats_path": path_stats
-                }
-            )
-
         except ReduceYouPathArea as _:
-            output = jsonify(
-                {
-                    "points_path": "Reduce your path. Overpass api could be angry ;)"
-                }
-            )
-        # except (ValueError) as err:
-        #     err = repr(err)
-        #     return bad_request(err, 400)
+            return bad_request("Reduce your path. Overpass api could be angry ;)", 400)
 
+        except EmptyData as _:
+            return bad_request("OsmGT empty data", 400)
+
+        output = jsonify(
+            {
+                "points_path": geojson_points_data,
+                "line_path": geojson_line_data,
+                "stats_path": path_stats
+            }
+        )
         output.headers.add('Access-Control-Allow-Origin', '*')
         return output
 
