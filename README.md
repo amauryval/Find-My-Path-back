@@ -6,4 +6,9 @@ FindMyPath
 [![codecov](https://codecov.io/gh/amauryval/FindMyPath/branch/master/graph/badge.svg)](https://codecov.io/gh/amauryval/FindMyPath)
 
 
+App available [here](https://amauryval.github.io/Find-My-Path/)
+
+Run docker
+```
 docker build -t find_my_path . && docker run -p 5000:5000 find_my_path:latest
+```
