@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: gunicorn main:app --log-file=-
+  web: gunicorn findmypath:app --log-file=-

@@ -7,11 +7,11 @@ from flask import request
 from flask import Blueprint
 from flask_cors import CORS
 
-from main.compute_path import ComputePath
-from main.compute_path import ReduceYouPathArea
+from findmypath.compute_path import ComputePath
+from findmypath.compute_path import ReduceYouPathArea
 
-from main.find_location import FindLocation
-from main.find_location import LocationNotFound
+from findmypath.find_location import FindLocation
+from findmypath.find_location import LocationNotFound
 
 from osmgt.compoments.core import EmptyData
 
@@ -40,7 +40,6 @@ def get_location():
         bbox = FindLocation(
             url_arg_keys["name"]
         ).run()
-        print("bbam")
         output = jsonify(
             {
                 "bbox": bbox
