@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           source ~/miniconda3/etc/profile.d/conda.sh
-          conda activate fmp
+          conda activate find_my_path
           python -m pytest --cov=fmp --cov-report=xml tests/
 
       - name: Upload coverage to Codecov

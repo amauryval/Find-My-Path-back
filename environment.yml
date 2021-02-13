@@ -1,4 +1,4 @@
-name: main
+name: find_my_path
 channels:
   - conda-forge
   - amauryval
