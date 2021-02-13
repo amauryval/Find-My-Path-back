@@ -1,6 +1,6 @@
 import pytest
 
-from app.compute_path import ComputePath
+from main.compute_path import ComputePath
 
 
 def test_pedestrian_path_with_elevation(path_nodes):
