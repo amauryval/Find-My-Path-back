@@ -7,7 +7,7 @@ from shapely.geometry import Point
 from shapely.geometry import LineString
 from operator import itemgetter
 
-from fmp.core.geometry import compute_wg84_line_length
+from app.core.geometry import compute_wg84_line_length
 
 import requests
 

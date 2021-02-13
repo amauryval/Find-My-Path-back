@@ -1,4 +1,4 @@
-name: fmp
+name: main
 channels:
   - conda-forge
   - amauryval
