@@ -29,7 +29,7 @@ def bad_request(message, error_value):
     return response
 
 
-@find_my_path.route('/location', methods=['GET'])
+@find_my_path.get('/location')
 def get_location():
 
     url_arg_keys = {
@@ -53,7 +53,7 @@ def get_location():
     output.headers.add('Access-Control-Allow-Origin', '*')
     return output
 
-@find_my_path.route('/health', methods=['GET'])
+@find_my_path.get('/health')
 def get_api_status():
     output = jsonify(
         {
@@ -63,7 +63,7 @@ def get_api_status():
 
     return output
 
-@find_my_path.route('/path', methods=['GET'])
+@find_my_path.get('/path')
 def get_path():
 
     url_arg_keys = {
