@@ -1,20 +1,18 @@
 FROM continuumio/miniconda3
 
-# for graphtool
+# install graphtool
 RUN apt-get update
 RUN apt install libgtk-3-0 libgtk-3-dev -y
 
-# prepare app directory
-COPY environment.yml /home/app/
-WORKDIR /home/app/
-
-# conda env creation
+WORKDIR /usr/src/
+RUN ls
+COPY environment.yml environment.yml
 RUN conda env create -f environment.yml
-RUN echo "source activate find_my_path" > ~/.bashrc
-ENV PATH /opt/conda/envs/find_my_path/bin:$PATH
 
-COPY . /home/app/
+COPY app.py app.py
+COPY /findmypath findmypath/
 
-EXPOSE 5000
-ENTRYPOINT ["python"]
-CMD ["main.py"]
+# RUN conda env update --name base --file environment.yml --prune
+RUN conda clean -a
+
+ENTRYPOINT [ "conda", "run", "-n", "findmypath", "gunicorn", "-b", "0.0.0.0:5001", "app:app"]
