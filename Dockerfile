@@ -5,7 +5,7 @@ USER root
 RUN apt-get update
 RUN apt install libgtk-3-0 libgtk-3-dev -y
 
-USER mamba
+USER micromamba
 WORKDIR /usr/src/
 RUN ls
 COPY environment.yml environment.yml
