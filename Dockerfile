@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:4.10.3-alpine
 
 # install graphtool
 RUN apt-get update
