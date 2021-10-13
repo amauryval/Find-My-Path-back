@@ -9,12 +9,10 @@ WORKDIR /usr/src/
 COPY environment.yml environment.yml
 RUN conda install -c conda-forge mamba
 RUN mamba env create -f environment.yml
+RUN conda clean --all --yes
 
 COPY app.py app.py
 COPY /findmypath findmypath/
-
-# RUN conda env update --name base --file environment.yml --prune
-RUN conda clean -a
 
 # no root user
 RUN useradd --no-create-home ava
