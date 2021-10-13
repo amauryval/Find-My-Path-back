@@ -16,4 +16,10 @@ COPY /findmypath findmypath/
 # RUN conda env update --name base --file environment.yml --prune
 RUN conda clean -a
 
+# no root user
+RUN useradd --no-create-home ava
+RUN chown -R ava:ava /opt/conda/envs/findmypath/
+USER ava
+
+
 ENTRYPOINT [ "conda", "run", "-n", "findmypath", "gunicorn", "-b", "0.0.0.0:5001", "app:app"]
