@@ -34,7 +34,7 @@ COPY --from=build /venv /venv
 
 # no root user
 RUN useradd --no-create-home ava
-RUN chown -R ava:ava /venv/lib/python3.8/site-packages/osmgt/geometry/
+RUN chown -R ava:ava /venv/lib/python3.9/site-packages/osmgt/geometry/
 
 RUN mkdir /tmp/matplotlib
 ENV MPLCONFIGDIR=/tmp/matplotlib
