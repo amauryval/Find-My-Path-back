@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3 AS build
+FROM continuumio/miniconda3:4.7.12 AS build
 
 WORKDIR /usr/src/
 
@@ -20,7 +20,7 @@ RUN /venv/bin/conda-unpack
 
 
 
-FROM debian:latest AS runtime
+FROM debian:stable-slim AS runtime
 
 # install graphtool
 RUN apt-get update && apt install libgtk-3-0 -y
