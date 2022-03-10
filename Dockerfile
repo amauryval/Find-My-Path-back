@@ -26,11 +26,11 @@ FROM debian:stable-slim AS runtime
 RUN apt-get update && apt install libgtk-3-0 -y
  #libgtk-3-dev -y
 
-COPY app.py app.py
-COPY /findmypath findmypath/
-
 # Copy /venv from the previous stage:
 COPY --from=build /venv /venv
+
+COPY app.py app.py
+COPY /findmypath findmypath/
 
 # no root user
 RUN useradd --no-create-home ava
