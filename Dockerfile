@@ -1,12 +1,12 @@
-FROM continuumio/miniconda3:4.11.0 AS build
+FROM continuumio/miniconda3:4.12.0 AS build
 
 WORKDIR /usr/src/
 
-COPY environment.yml environment.yml
 RUN conda install -c conda-forge mamba conda-pack
 
-RUN mamba env create -f environment.yml
-RUN conda clean --all --yes
+COPY environment.yml environment.yml
+RUN mamba env create -f environment.yml \\
+    && conda clean --all --yes
 
 # Use conda-pack to create a standalone enviornment
 # in /venv:
