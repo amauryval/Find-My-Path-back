@@ -5,7 +5,7 @@ WORKDIR /usr/src/
 RUN conda install -c conda-forge mamba conda-pack
 
 COPY environment.yml environment.yml
-RUN mamba env create -f environment.yml \\
+RUN mamba env create -f environment.yml \
     && conda clean --all --yes
 
 # Use conda-pack to create a standalone enviornment
